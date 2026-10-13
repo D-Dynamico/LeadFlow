@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.errors import AppError, lead_not_found
-from app.models import Lead, LeadStatus
+from app.models import Discussion, DiscussionKind, Lead, LeadStatus
 from app.schemas import LeadCounts, LeadCreate, LeadListOut, LeadOut, LeadUpdate
 from app.timeutil import local_day_bounds
 
@@ -155,18 +155,45 @@ def create_lead(db: Session, data: LeadCreate, now: datetime) -> Lead:
     return lead
 
 
+STATUS_LABELS = {
+    LeadStatus.NEW: "New",
+    LeadStatus.CONTACTED: "Contacted",
+    LeadStatus.QUALIFIED: "Qualified",
+    LeadStatus.PROPOSAL_SENT: "Proposal Sent",
+    LeadStatus.WON: "Won",
+    LeadStatus.LOST: "Lost",
+}
+
+
+def status_change_body(old: LeadStatus, new: LeadStatus) -> str:
+    """Timeline text for a status change, e.g. `Contacted → Qualified` (R-5)."""
+    return f"{STATUS_LABELS[old]} → {STATUS_LABELS[new]}"
+
+
 def update_lead(db: Session, lead_id: str, data: LeadUpdate, now: datetime) -> Lead:
     """Apply the sent fields. Any status transition is allowed (R-5, D-10).
 
-    Setting the same value again is a no-op and does not bump `updated_at`.
-    Never touches `next_follow_up_at` (R-4).
+    A real status change writes a `status_change` discussion in the same transaction (D-9).
+    Setting the same value again is a no-op: no entry, no `updated_at` bump.
+    Never touches `next_follow_up_at` (R-4) or the last-note fields (Write rules).
     """
     lead = get_lead(db, lead_id)
     changed = False
     for field, value in data.model_dump(exclude_unset=True).items():
-        if getattr(lead, field) != value:
-            setattr(lead, field, value)
-            changed = True
+        old = getattr(lead, field)
+        if old == value:
+            continue
+        if field == "status":
+            db.add(
+                Discussion(
+                    lead_id=lead.id,
+                    kind=DiscussionKind.STATUS_CHANGE,
+                    body=status_change_body(old, value),
+                    created_at=now,
+                )
+            )
+        setattr(lead, field, value)
+        changed = True
     if changed:
         lead.updated_at = now
         db.commit()

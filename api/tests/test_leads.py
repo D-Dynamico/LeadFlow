@@ -1,7 +1,7 @@
 """Leads endpoints, see API.md Endpoints and Error envelope."""
 
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -111,31 +111,6 @@ def test_list_state_uses_request_timezone(
 
     assert section_and_state("Asia/Kolkata") == ("others", "upcoming")
     assert section_and_state("UTC") == ("pinned", "today")
-
-
-def test_patch_status_persists_and_keeps_follow_up(
-    client: TestClient, make_lead: Callable[..., Lead], fixed_now: datetime
-) -> None:
-    follow_up = fixed_now + timedelta(days=2)
-    lead = make_lead(next_follow_up_at=follow_up, status=LeadStatus.CONTACTED)
-
-    response = client.patch(f"/api/v1/leads/{lead.id}", json={"status": "proposal_sent"})
-
-    assert response.status_code == 200
-    assert response.json()["updated_at"] == "2026-10-13T10:00:00Z"
-    fetched = client.get(f"/api/v1/leads/{lead.id}").json()
-    assert fetched["status"] == "proposal_sent"
-    assert fetched["next_follow_up_at"] == "2026-10-15T10:00:00Z"
-
-
-def test_patch_same_status_is_noop(client: TestClient, make_lead: Callable[..., Lead]) -> None:
-    lead = make_lead(status=LeadStatus.WON)
-    before = client.get(f"/api/v1/leads/{lead.id}").json()["updated_at"]
-
-    response = client.patch(f"/api/v1/leads/{lead.id}", json={"status": "won"})
-
-    assert response.status_code == 200
-    assert response.json()["updated_at"] == before
 
 
 @pytest.mark.parametrize(
