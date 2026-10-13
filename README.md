@@ -22,8 +22,10 @@ docker compose up --build
 
 ## Manual setup
 
-Requires Python 3.12, Node 20+, and a local Postgres 16 with `leadflow` and `leadflow_test` databases
-(or run only the database with `docker compose up db`).
+Requires Python 3.12, Node 20+, and Postgres 16 with `leadflow` and `leadflow_test` databases.
+The easiest way is to run only the database with `docker compose up db`. It is published on host
+port 5433 (`POSTGRES_HOST_PORT`), so it does not clash with a native Postgres on 5432. If you use
+your own Postgres instead, point `DATABASE_URL` and `TEST_DATABASE_URL` at it.
 
 API:
 
@@ -32,7 +34,7 @@ cd api
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
-export DATABASE_URL=postgresql+psycopg://leadflow:leadflow@localhost:5432/leadflow
+export DATABASE_URL=postgresql+psycopg://leadflow:leadflow@localhost:5433/leadflow
 alembic upgrade head
 uvicorn app.main:app --reload
 ```

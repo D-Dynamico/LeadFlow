@@ -12,7 +12,8 @@ docker compose up --build
 
 Compose services:
 
-- `db`: postgres:16, healthcheck `pg_isready`, named volume, creates `leadflow` and `leadflow_test`
+- `db`: postgres:16, healthcheck `pg_isready`, named volume, creates `leadflow` and `leadflow_test`;
+  published on host port `POSTGRES_HOST_PORT` (default 5433, D-15)
 - `api`: waits for `db` healthy, runs `alembic upgrade head`, seeds if `SEED_ON_START=true`, then uvicorn
 - `web`: Next.js production build, `NEXT_PUBLIC_API_URL` from env
 
@@ -22,8 +23,9 @@ Compose services:
 POSTGRES_USER=leadflow
 POSTGRES_PASSWORD=leadflow
 POSTGRES_DB=leadflow
+POSTGRES_HOST_PORT=5433
 DATABASE_URL=postgresql+psycopg://leadflow:leadflow@db:5432/leadflow
-TEST_DATABASE_URL=postgresql+psycopg://leadflow:leadflow@localhost:5432/leadflow_test
+TEST_DATABASE_URL=postgresql+psycopg://leadflow:leadflow@localhost:5433/leadflow_test
 FRONTEND_ORIGIN=http://localhost:3000
 SEED_ON_START=true
 LOG_LEVEL=info

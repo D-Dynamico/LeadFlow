@@ -60,6 +60,12 @@ polish instead. Revisit only if every other stage is done early.
 ### D-14 No pagination, no search index
 Alternatives: cursor pagination, pg_trgm. Why: demo scale (tens of leads). Listed as next steps.
 
+### D-15 Docker db published on host port 5433, configurable
+Alternatives: keep 5432; ask developers to stop their native Postgres. Why: a native Postgres on
+5432 is common and breaks a fresh clone, because host tools such as pytest reach it instead of the
+Docker db. `POSTGRES_HOST_PORT` (default 5433) moves only the host side; containers still use
+`db:5432`.
+
 ## Open
 
 - Deploy target for the live link: Vercel + Render/Railway, or skip. Decide on Day 3.
