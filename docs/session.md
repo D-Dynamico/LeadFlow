@@ -3,31 +3,33 @@
 Updated: Tue 13 Oct 2026, night. Deadline: Fri 16 Oct.
 
 ## Done
-- Planning: docs, rules R-1 to R-6, decisions D-1 to D-14, CLAUDE.md, rules, settings.
-- S1 Scaffold: exit criteria pass. `docker compose up --build` starts db, api, web;
-  `GET /api/v1/health` returns 200; web shows a placeholder page; db has `leadflow` and `leadflow_test`.
+- S1 Scaffold: compose runs db, api, web; health at `/api/v1/health`.
+- S2 API core: exit criteria pass. Models + first migration, error envelope (D-12),
+  `timeutil` (R-1, R-6), leads create/get/patch/list with filter, search, counts,
+  `follow_up_state` (R-2). 41 API tests green.
 
 ## Now
-- Stage S2 API core (WORKFLOWS.md, Build stages). Not started.
+- Stage S3 Follow-up rules, discussions, seed (WORKFLOWS.md, Build stages). Not started.
 
 ## Next
-1. S2: `models.py` (ARCHITECTURE.md, Data model) and first Alembic migration with the indexes;
-   `errors.py` envelope + override default 422 (API.md, D-12); `timeutil.py` (R-1);
-   `schemas.py`; leads service + router: create, get, patch, list with status filter and search.
-   Tests: follow-up state and leads endpoints against `leadflow_test` (TEST_PLAN.md); needs a
-   conftest that uses `TEST_DATABASE_URL`.
-2. S3: pinning (R-3), discussions with write-rules transaction (R-4, R-5), mark done, seed script,
-   then add the `SEED_ON_START` step to `api/entrypoint.sh`.
+1. Pinning in `services/leads.list_leads` (R-3): today it returns `pinned: []` and every
+   lead in `others` by activity desc. Add the split, overdue-then-today order, won/lost sink.
+2. `PATCH` status: write the `status_change` discussion (R-5, D-9). Same-status no-op exists.
+3. `services/discussions.py` + router: add note in one transaction (Write rules, R-4, D-7, D-8),
+   timeline newest first, `DELETE /leads/{id}/follow-up`. Extend the 404 test to those routes.
+4. `scripts/seed.py --reset` (TEST_PLAN.md seed table); add `SEED_ON_START` to `api/entrypoint.sh`.
+5. Run every mutation check in TEST_PLAN.md. "d0 + 24h" means UTC start plus 24 hours;
+   adding a day to a ZoneInfo-aware local datetime is wall-clock and breaks nothing.
 
-## Notes for S2
-- Health is mounted under the `/api/v1` prefix, like every other route.
-- `api/entrypoint.sh` runs `alembic upgrade head` then uvicorn; seeding is deferred to S3.
-- Alembic `env.py` reads `DATABASE_URL` from settings and targets `app.db.Base.metadata`;
-  `models.py` must be imported in `env.py` once it exists, or autogenerate sees no tables.
-- Local runs: `.env` points `DATABASE_URL` at host `db`; outside Docker override it with
-  `localhost` (env var or `api/.env`, which beats the root `.env`).
-- API test client uses `httpx2` (Starlette deprecated `httpx`).
-- `web/` is Next 16.4 with `output: "standalone"`; shadcn style `base-nova`. Only `button` is added so far.
+## Notes
+- Services take `now`; routers get it from `Depends(timeutil.utcnow)`, which tests override.
+- Tests: `conftest.py` drops and migrates `TEST_DATABASE_URL` (must end in `_test`) and
+  wraps each test in a rolled-back transaction. Factories: `make_lead`, `make_discussion`.
+- Unknown routes return `NOT_FOUND`, 405 returns `METHOD_NOT_ALLOWED` (not in API.md's table).
+- Dev machine runs a native Postgres on 5432, so host tools cannot reach the Docker db there.
+  Workaround: publish the Docker db on 5433 with a compose override kept outside the repo,
+  and point `DATABASE_URL` / `TEST_DATABASE_URL` at `localhost:5433`.
 
 ## Open questions
 - Deploy target (DECISIONS.md, Open), decide Day 3.
+- Port 5432 conflict on the dev machine (see Notes): awaiting the user's call.
