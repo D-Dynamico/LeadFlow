@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { FollowUpChip } from "@/components/leads/FollowUpChip";
-import { StatusBadge } from "@/components/leads/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,6 +18,7 @@ import { ApiError } from "@/lib/api";
 
 import { AddDiscussionForm } from "./AddDiscussionForm";
 import { DiscussionItem } from "./DiscussionItem";
+import { StatusSelect } from "./StatusSelect";
 
 type Props = { leadId: string | null; tz: string; onClose: () => void };
 
@@ -56,7 +56,7 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
                 </DialogDescription>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <StatusBadge status={lead.data.status} />
+                <StatusSelect leadId={lead.data.id} status={lead.data.status} />
                 <FollowUpChip lead={lead.data} tz={tz} />
               </div>
             </>
