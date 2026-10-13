@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
-from app.models import Discussion, DiscussionKind, Lead
+from app.models import Discussion, DiscussionKind, Lead, LeadStatus
 
 UNKNOWN_ID = "00000000-0000-4000-8000-000000000000"
 
@@ -126,14 +126,33 @@ def test_timeline_is_newest_first(
     ]
 
 
-@pytest.mark.parametrize("lead_id", [UNKNOWN_ID, "not-a-uuid"])
-@pytest.mark.parametrize("method", ["GET", "POST"])
-def test_discussions_for_unknown_lead_are_404(
-    client: TestClient, method: str, lead_id: str
+def test_mark_follow_up_done_clears_it_without_a_note(
+    client: TestClient, make_lead: Callable[..., Lead], fixed_now: datetime
 ) -> None:
-    response = client.request(
-        method, f"/api/v1/leads/{lead_id}/discussions", json={"body": "Hello"}
+    lead = make_lead(
+        status=LeadStatus.QUALIFIED,
+        next_follow_up_at=fixed_now - timedelta(hours=1),
+        last_note_preview="Call back after lunch",
     )
+
+    response = client.delete(f"/api/v1/leads/{lead.id}/follow-up")
+
+    assert response.status_code == 204
+    assert response.content == b""
+    fetched = client.get(f"/api/v1/leads/{lead.id}").json()
+    assert fetched["next_follow_up_at"] is None
+    assert fetched["follow_up_state"] == "none"
+    assert fetched["last_note_preview"] == "Call back after lunch"
+    assert client.get(url(lead)).json() == []
+    assert client.delete(f"/api/v1/leads/{lead.id}/follow-up").status_code == 204
+
+
+@pytest.mark.parametrize("lead_id", [UNKNOWN_ID, "not-a-uuid"])
+@pytest.mark.parametrize(
+    ("method", "suffix"), [("GET", "discussions"), ("POST", "discussions"), ("DELETE", "follow-up")]
+)
+def test_unknown_lead_is_404(client: TestClient, method: str, suffix: str, lead_id: str) -> None:
+    response = client.request(method, f"/api/v1/leads/{lead_id}/{suffix}", json={"body": "Hello"})
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "LEAD_NOT_FOUND"

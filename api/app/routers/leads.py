@@ -57,3 +57,13 @@ def update_lead(
 ) -> LeadOut:
     lead = service.update_lead(db, lead_id, data, now)
     return service.to_out(lead, now, resolve_tz(UTC_ZONE))
+
+
+@router.delete("/{lead_id}/follow-up", status_code=status.HTTP_204_NO_CONTENT)
+def mark_follow_up_done(
+    lead_id: str,
+    db: Session = Depends(get_db),
+    now: datetime = Depends(utcnow),
+) -> Response:
+    service.mark_follow_up_done(db, lead_id, now)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

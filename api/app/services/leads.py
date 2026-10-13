@@ -1,4 +1,5 @@
-"""Lead business logic: follow-up state (R-2), list and pinning (R-3), create, update (R-5)."""
+"""Lead business logic: follow-up state (R-2), list and pinning (R-3), create, update (R-5),
+mark follow-up done (R-4)."""
 
 import uuid
 from datetime import datetime
@@ -198,3 +199,13 @@ def update_lead(db: Session, lead_id: str, data: LeadUpdate, now: datetime) -> L
         lead.updated_at = now
         db.commit()
     return lead
+
+
+def mark_follow_up_done(db: Session, lead_id: str, now: datetime) -> None:
+    """Clear the follow-up without adding a discussion (R-4). Idempotent."""
+    lead = get_lead(db, lead_id)
+    if lead.next_follow_up_at is None:
+        return
+    lead.next_follow_up_at = None
+    lead.updated_at = now
+    db.commit()
