@@ -26,10 +26,8 @@ Updated: Tue 13 Oct 2026, night. Deadline: Fri 16 Oct.
 - Tests: `conftest.py` drops and migrates `TEST_DATABASE_URL` (must end in `_test`) and
   wraps each test in a rolled-back transaction. Factories: `make_lead`, `make_discussion`.
 - Unknown routes return `NOT_FOUND`, 405 returns `METHOD_NOT_ALLOWED` (not in API.md's table).
-- Dev machine runs a native Postgres on 5432, so host tools cannot reach the Docker db there.
-  Workaround: publish the Docker db on 5433 with a compose override kept outside the repo,
-  and point `DATABASE_URL` / `TEST_DATABASE_URL` at `localhost:5433`.
+- Docker db is published on host port `POSTGRES_HOST_PORT` (default 5433, D-15); host tools
+  and pytest use `localhost:5433`, containers use `db:5432`.
 
 ## Open questions
 - Deploy target (DECISIONS.md, Open), decide Day 3.
-- Port 5432 conflict on the dev machine (see Notes): awaiting the user's call.
