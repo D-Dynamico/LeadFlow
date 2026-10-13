@@ -12,6 +12,7 @@ import type {
   Discussion,
   DiscussionCreateInput,
   Lead,
+  LeadCreateInput,
   LeadList,
   LeadStatus,
 } from "@/lib/types";
@@ -98,5 +99,14 @@ export function useMarkFollowUpDone(leadId: string) {
       void queryClient.invalidateQueries({ queryKey: ["leads"] });
     },
     onError: (error) => toast.error(`Could not mark the follow-up done: ${error.message}`),
+  });
+}
+
+/** Create a lead, then refetch the lists so it lands in the right place (Add a lead). */
+export function useCreateLead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: LeadCreateInput) => api.createLead(input),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["leads"] }),
   });
 }

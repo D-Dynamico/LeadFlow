@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,20 @@ type Props = {
   counts: LeadCounts | undefined;
   onStatusChange: (status: LeadStatus | null) => void;
   onQueryChange: (q: string) => void;
+  onAddLead: () => void;
 };
 
-export function LeadToolbar({ status, q, counts, onStatusChange, onQueryChange }: Props) {
+export function LeadToolbar(props: Props) {
+  const { status, q, counts, onStatusChange, onQueryChange, onAddLead } = props;
   return (
     <div className="flex flex-col gap-3">
-      <SearchInput q={q} onQueryChange={onQueryChange} />
+      <div className="flex items-center gap-2">
+        <SearchInput q={q} onQueryChange={onQueryChange} />
+        <Button type="button" onClick={onAddLead} className="ml-auto" title="Add lead (N)">
+          <Plus data-icon="inline-start" />
+          Add lead
+        </Button>
+      </div>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by status">
         <StatusChip
           label="All"
@@ -66,7 +74,7 @@ function SearchInput({ q, onQueryChange }: { q: string; onQueryChange: (q: strin
   }, [text, q, onQueryChange]);
 
   return (
-    <div className="relative sm:max-w-sm">
+    <div className="relative flex-1 sm:max-w-sm">
       <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="search"
