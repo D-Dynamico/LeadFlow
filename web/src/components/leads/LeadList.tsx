@@ -17,7 +17,9 @@ type Props = {
 /** Pinned section, then everything else, in the order the API returns (D-4). */
 export function LeadList({ data, isPending, error, onRetry, tz, filtered, onSelect }: Props) {
   if (isPending) return <LeadListSkeleton />;
-  if (error || !data) {
+  // A failed background refetch keeps showing the cached list; the error only matters
+  // when there is nothing to show.
+  if (!data) {
     return (
       <div className="rounded-lg border p-6 text-center">
         <p className="font-medium">Could not load leads</p>

@@ -60,6 +60,11 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
                 <FollowUpChip lead={lead.data} tz={tz} />
               </div>
             </>
+          ) : lead.error && !notFound ? (
+            <>
+              <DialogTitle>Could not load this lead</DialogTitle>
+              <DialogDescription>{lead.error.message}</DialogDescription>
+            </>
           ) : (
             <>
               <DialogTitle className="sr-only">Loading lead</DialogTitle>
@@ -75,13 +80,20 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
               <AddDiscussionForm key={leadId} leadId={leadId} />
             </div>
           )}
-          {discussions.isPending ? (
-            <div className="flex flex-col gap-3 py-4" aria-busy="true">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-5/6" />
-            </div>
+          {discussions.data ? (
+            discussions.data.length > 0 ? (
+              <ol className="divide-y" aria-label="Timeline">
+                {discussions.data.map((discussion) => (
+                  <DiscussionItem key={discussion.id} discussion={discussion} tz={tz} />
+                ))}
+              </ol>
+            ) : (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                No discussions yet.
+              </p>
+            )
           ) : discussions.error && !notFound ? (
+            // Shown only when nothing is cached; a failed refetch keeps the timeline.
             <div className="py-6 text-center text-sm">
               <p>Could not load the timeline.</p>
               <Button
@@ -93,20 +105,12 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
                 Try again
               </Button>
             </div>
-          ) : discussions.data && discussions.data.length > 0 ? (
-            <ol className="divide-y" aria-label="Timeline">
-              {discussions.data.map((discussion) => (
-                <DiscussionItem
-                  key={discussion.id}
-                  discussion={discussion}
-                  tz={tz}
-                />
-              ))}
-            </ol>
           ) : (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              No discussions yet.
-            </p>
+            <div className="flex flex-col gap-3 py-4" aria-busy="true">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
           )}
         </div>
       </DialogContent>
