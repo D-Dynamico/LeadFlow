@@ -1,1 +1,77 @@
 # LeadFlow
+
+A single-screen lead management mini CRM. Track leads, log every discussion in a timeline, and set
+follow-up reminders. Today's and overdue follow-ups are pinned to the top of the list.
+
+## Stack
+
+- `api/`: FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, Postgres 16, pytest
+- `web/`: Next.js (App Router, TypeScript), Tailwind, shadcn/ui, TanStack Query
+- `docker-compose.yml`: `db`, `api`, `web`
+
+## Setup with Docker
+
+```
+cp .env.example .env
+docker compose up --build
+```
+
+- Web: http://localhost:3000
+- API: http://localhost:8000/api/v1 (health: `/api/v1/health`)
+- API docs: http://localhost:8000/docs
+
+## Manual setup
+
+Requires Python 3.12, Node 20+, and a local Postgres 16 with `leadflow` and `leadflow_test` databases
+(or run only the database with `docker compose up db`).
+
+API:
+
+```
+cd api
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+export DATABASE_URL=postgresql+psycopg://leadflow:leadflow@localhost:5432/leadflow
+alembic upgrade head
+uvicorn app.main:app --reload
+```
+
+Web:
+
+```
+cd web
+npm install
+npm run dev
+```
+
+## Tests
+
+```
+cd api && pytest
+cd web && npm run lint && npx tsc --noEmit
+```
+
+## Seed data
+
+TODO
+
+## Decisions
+
+TODO: summary linking to [docs/DECISIONS.md](docs/DECISIONS.md).
+
+## API
+
+TODO: endpoint table (see [docs/API.md](docs/API.md)).
+
+## How I used AI
+
+TODO
+
+## Known limitations
+
+TODO
+
+## Next steps
+
+TODO
