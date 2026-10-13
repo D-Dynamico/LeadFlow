@@ -1,0 +1,22 @@
+# env
+.env
+.env.*
+!.env.example
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# node
+node_modules/
+
+# os and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# local claude settings
+.claude/settings.local.json
