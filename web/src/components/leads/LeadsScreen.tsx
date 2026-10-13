@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { LeadTimelineDialog } from "@/components/timeline/LeadTimelineDialog";
 import { useLeadFilters } from "@/hooks/useLeadFilters";
 import { useLeads } from "@/hooks/useLeads";
 import { browserTimeZone } from "@/lib/dates";
@@ -11,7 +12,8 @@ import { LeadToolbar } from "./LeadToolbar";
 
 export function LeadsScreen() {
   const [tz] = useState(browserTimeZone);
-  const { status, q, setStatus, setQuery } = useLeadFilters();
+  const { status, q, leadId, setStatus, setQuery, openLead, closeLead } =
+    useLeadFilters();
   const leads = useLeads({ status, q, tz });
 
   return (
@@ -30,7 +32,9 @@ export function LeadsScreen() {
         onRetry={() => void leads.refetch()}
         tz={tz}
         filtered={status !== null || q !== ""}
+        onSelect={openLead}
       />
+      <LeadTimelineDialog leadId={leadId} tz={tz} onClose={closeLead} />
     </div>
   );
 }

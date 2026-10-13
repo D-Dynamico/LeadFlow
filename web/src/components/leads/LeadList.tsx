@@ -11,10 +11,11 @@ type Props = {
   onRetry: () => void;
   tz: string;
   filtered: boolean;
+  onSelect: (id: string) => void;
 };
 
 /** Pinned section, then everything else, in the order the API returns (D-4). */
-export function LeadList({ data, isPending, error, onRetry, tz, filtered }: Props) {
+export function LeadList({ data, isPending, error, onRetry, tz, filtered, onSelect }: Props) {
   if (isPending) return <LeadListSkeleton />;
   if (error || !data) {
     return (
@@ -39,13 +40,19 @@ export function LeadList({ data, isPending, error, onRetry, tz, filtered }: Prop
   }
   return (
     <div className="flex flex-col gap-6">
-      {data.pinned.length > 0 && <Section title="Follow up today" leads={data.pinned} tz={tz} />}
-      {data.others.length > 0 && <Section title="All leads" leads={data.others} tz={tz} />}
+      {data.pinned.length > 0 && (
+        <Section title="Follow up today" leads={data.pinned} tz={tz} onSelect={onSelect} />
+      )}
+      {data.others.length > 0 && (
+        <Section title="All leads" leads={data.others} tz={tz} onSelect={onSelect} />
+      )}
     </div>
   );
 }
 
-function Section({ title, leads, tz }: { title: string; leads: Lead[]; tz: string }) {
+type SectionProps = { title: string; leads: Lead[]; tz: string; onSelect: (id: string) => void };
+
+function Section({ title, leads, tz, onSelect }: SectionProps) {
   return (
     <section aria-label={title}>
       <h2 className="mb-2 text-sm font-medium text-muted-foreground">
@@ -53,7 +60,7 @@ function Section({ title, leads, tz }: { title: string; leads: Lead[]; tz: strin
       </h2>
       <ul className="divide-y overflow-hidden rounded-lg border bg-card">
         {leads.map((lead) => (
-          <LeadRow key={lead.id} lead={lead} tz={tz} />
+          <LeadRow key={lead.id} lead={lead} tz={tz} onSelect={onSelect} />
         ))}
       </ul>
     </section>
