@@ -18,6 +18,7 @@ import { ApiError } from "@/lib/api";
 
 import { AddDiscussionForm } from "./AddDiscussionForm";
 import { DiscussionItem } from "./DiscussionItem";
+import { MarkFollowUpDoneButton } from "./MarkFollowUpDoneButton";
 import { StatusSelect } from "./StatusSelect";
 
 type Props = { leadId: string | null; tz: string; onClose: () => void };
@@ -58,6 +59,9 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
               <div className="flex flex-wrap items-center gap-2">
                 <StatusSelect leadId={lead.data.id} status={lead.data.status} />
                 <FollowUpChip lead={lead.data} tz={tz} />
+                {lead.data.follow_up_state !== "none" && (
+                  <MarkFollowUpDoneButton leadId={lead.data.id} />
+                )}
               </div>
             </>
           ) : lead.error && !notFound ? (

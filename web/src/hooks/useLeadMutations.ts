@@ -87,3 +87,16 @@ export function useUpdateStatus(leadId: string) {
     },
   });
 }
+
+/** Clear the follow-up without a note (R-4), then refetch the lead and lists. */
+export function useMarkFollowUpDone(leadId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.markFollowUpDone(leadId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: leadKey(leadId) });
+      void queryClient.invalidateQueries({ queryKey: ["leads"] });
+    },
+    onError: (error) => toast.error(`Could not mark the follow-up done: ${error.message}`),
+  });
+}
