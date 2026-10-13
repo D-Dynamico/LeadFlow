@@ -24,10 +24,9 @@ Updated: Wed 14 Oct 2026. Deadline: Fri 16 Oct.
   caches and then invalidate `["lead", id]` and `["leads"]` to refetch in the viewer's tz.
 - Lists and the timeline keep cached data when a background refetch fails; the error state only
   shows when nothing is cached.
-- `next dev` writes `web/AGENTS.md`; delete it, never commit it (open question below).
+- `agentRules: false` in `web/next.config.ts` keeps `next dev` from writing `web/AGENTS.md`.
 - Docker web image builds take about 10 minutes; use `npm run dev` with `docker compose stop web`
   and make sure no orphaned `next` process holds port 3000 afterwards.
 
 ## Open questions
 - Deploy target (DECISIONS.md, Open), decide Day 3.
-- Set `agentRules: false` in `next.config.ts` to stop `web/AGENTS.md`? Awaiting the user.
