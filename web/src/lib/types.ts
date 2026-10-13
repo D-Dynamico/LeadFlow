@@ -41,6 +41,31 @@ export type LeadListParams = {
   tz: string;
 };
 
+export type DiscussionKind = "note" | "status_change";
+
+export type Discussion = {
+  id: string;
+  lead_id: string;
+  kind: DiscussionKind;
+  body: string;
+  follow_up_at: string | null;
+  created_at: string;
+};
+
+export type AddDiscussionResult = { discussion: Discussion; lead: Lead };
+
+export type LeadCreateInput = { name: string; company?: string; phone?: string };
+
+export type LeadUpdateInput = Partial<{
+  status: LeadStatus;
+  name: string;
+  company: string | null;
+  phone: string | null;
+}>;
+
+/** `follow_up_at` is ISO 8601 with an offset; the API rejects naive times. */
+export type DiscussionCreateInput = { body: string; follow_up_at?: string };
+
 export type ErrorDetail = { field: string; message: string };
 
 export type ErrorEnvelope = {
