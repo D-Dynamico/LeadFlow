@@ -1,4 +1,12 @@
-import { differenceInCalendarDays, formatDistanceToNowStrict } from "date-fns";
+import {
+  addDays,
+  differenceInCalendarDays,
+  format,
+  formatDistanceToNowStrict,
+  nextMonday,
+  setHours,
+  startOfDay,
+} from "date-fns";
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 
 /** The viewer's IANA timezone, sent with every list request (R-1). */
@@ -26,4 +34,25 @@ export function formatFollowUp(iso: string, tz: string, now: Date = new Date()):
   if (days === -1) return `Yesterday, ${time}`;
   const sameYear = formatInTimeZone(date, tz, "yyyy") === formatInTimeZone(now, tz, "yyyy");
   return formatInTimeZone(date, tz, sameYear ? "EEE d MMM, h:mm a" : "d MMM yyyy, h:mm a");
+}
+
+const at10am = (day: Date) => setHours(startOfDay(day), 10);
+
+/** Follow-up shortcuts in the viewer's local time (ARCHITECTURE.md, Components). */
+export function quickPicks(now: Date = new Date()): { label: string; date: Date }[] {
+  return [
+    { label: "Tomorrow 10 AM", date: at10am(addDays(now, 1)) },
+    { label: "In 3 days", date: at10am(addDays(now, 3)) },
+    { label: "Next Monday 10 AM", date: at10am(nextMonday(now)) },
+  ];
+}
+
+/** Value for an `<input type="datetime-local">`, in the browser's local time. */
+export function toDateTimeLocal(date: Date): string {
+  return format(date, "yyyy-MM-dd'T'HH:mm");
+}
+
+/** A `datetime-local` value to ISO 8601 UTC, which carries the offset the API requires. */
+export function fromDateTimeLocal(value: string): string {
+  return new Date(value).toISOString();
 }

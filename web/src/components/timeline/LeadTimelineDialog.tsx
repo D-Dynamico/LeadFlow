@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDiscussions, useLead } from "@/hooks/useLeads";
 import { ApiError } from "@/lib/api";
 
+import { AddDiscussionForm } from "./AddDiscussionForm";
 import { DiscussionItem } from "./DiscussionItem";
 
 type Props = { leadId: string | null; tz: string; onClose: () => void };
@@ -69,6 +70,11 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
         </DialogHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4">
+          {leadId && (
+            <div className="border-b py-4">
+              <AddDiscussionForm key={leadId} leadId={leadId} />
+            </div>
+          )}
           {discussions.isPending ? (
             <div className="flex flex-col gap-3 py-4" aria-busy="true">
               <Skeleton className="h-4 w-full" />
