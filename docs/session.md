@@ -3,30 +3,31 @@
 Updated: Wed 14 Oct 2026. Deadline: Fri 16 Oct.
 
 ## Done
-- S1 to S3: API complete for every endpoint in API.md; 65 tests, all mutation checks pass.
-- S4 Frontend list: exit criteria pass (checked in Chrome against seeded data). Typed client
-  with error envelope, `useLeads`, Pinned and All sections, `LeadRow`, `StatusBadge`,
-  `FollowUpChip`, time ago, debounced search, status chips with counts, `?status=&q=` in the URL.
+- S1 to S4: API complete (65 tests, all mutation checks pass); list, search, filters, URL state.
+- S5 Dialog and mutations: exit criteria pass (checked by hand in Chrome). `?lead=<id>` opens
+  the timeline dialog; add note with quick picks and Ctrl/Cmd+Enter; optimistic status select
+  with rollback + toast; mark follow-up done; Add Lead dialog with `N`. Every functional rubric
+  item works; the list updates without a visible refetch.
 
 ## Now
-- Stage S5 Dialog and mutations (WORKFLOWS.md, Build stages). Not started.
+- Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). Not started.
 
 ## Next
-1. S5: `?lead=<id>` opens `LeadTimelineDialog` (`GET /leads/{id}?tz=`, `/discussions`);
-   404 closes it and clears the param. `StatusSelect` (optimistic, rollback + toast).
-   `AddDiscussionForm` with quick picks, Cmd/Ctrl+Enter. `AddLeadDialog`, `N` shortcut.
-   `hooks/useLeadMutations.ts` with cache updates (ARCHITECTURE.md, Cache updates).
-   Needs react-hook-form, zod, a toast (shadcn sonner), shadcn dialog, select, textarea.
-2. S6: polish, README, screenshots, video, deploy decision.
+1. Mobile check (rows stack, dialog full height), empty and error states pass, small visual fixes.
+2. README: setup (Docker and manual), tests, seed, decisions summary linking DECISIONS.md, API
+   table, How I used AI, known limitations, next steps. Screenshots in `docs/screenshots/`.
+3. Walkthrough video (2 to 3 min), optional deploy (DECISIONS.md, Open), definition of done.
 
 ## Notes
-- `useLeadFilters` writes the URL with `router.replace`; keep `lead` alongside `status` and `q`.
-- `SearchInput` only adopts URL changes it did not push itself, so typing is never clobbered.
-- The lead list is a client subtree under `<Suspense>` in `page.tsx` (needed for `useSearchParams`).
-- `next dev` writes `web/AGENTS.md`; delete it, never commit it (or set `agentRules: false`).
+- Mutation hooks live in `hooks/useLeadMutations.ts`; reads and query keys in `hooks/useLeads.ts`.
+- POST discussion and PATCH return `follow_up_state` in UTC, so the hooks write the lead into
+  caches and then invalidate `["lead", id]` and `["leads"]` to refetch in the viewer's tz.
+- Lists and the timeline keep cached data when a background refetch fails; the error state only
+  shows when nothing is cached.
+- `next dev` writes `web/AGENTS.md`; delete it, never commit it (open question below).
 - Docker web image builds take about 10 minutes; use `npm run dev` with `docker compose stop web`
-  for UI work. Seed with `docker compose exec api python -m scripts.seed --reset`.
-- POSTs and PATCH return `follow_up_state` in UTC; write the lead into caches, then invalidate.
+  and make sure no orphaned `next` process holds port 3000 afterwards.
 
 ## Open questions
 - Deploy target (DECISIONS.md, Open), decide Day 3.
+- Set `agentRules: false` in `next.config.ts` to stop `web/AGENTS.md`? Awaiting the user.
