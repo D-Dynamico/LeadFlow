@@ -7,7 +7,11 @@ Commit history is graded, so it must read like a person's work log.
 - Conventional commits: `type(scope): summary`. Types: feat, fix, test, docs, chore, refactor, style.
   Scopes: `api`, `web`, `infra`, `docs`.
 - Summary in imperative mood, lowercase, under 72 characters, no trailing period.
-- Body (optional) says why, and cites the rule or decision it implements: `Implements R-3 pinned ordering.`
+- Body is required on every commit from Stage S2 onward. S1 scaffold commits may skip it.
+  The body explains why the change was made, not what the diff shows, in 1 to 3 short lines.
+  Cite the rule or decision it implements, e.g. `Implements R-3; overdue pinned with today's per D-5.`
+  If none applies, say what problem it solves.
+  Wrap body lines at 72 characters, with a blank line between summary and body.
 - One idea per commit. Split a mixed change before committing.
 
 ## No trailers, no tool mentions
