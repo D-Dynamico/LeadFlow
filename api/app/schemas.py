@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from pydantic import (
+    AwareDatetime,
     BaseModel,
     ConfigDict,
     Field,
@@ -14,7 +15,7 @@ from pydantic import (
     field_validator,
 )
 
-from app.models import LeadStatus
+from app.models import DiscussionKind, LeadStatus
 
 PHONE_RE = re.compile(r"^[0-9+\-\s()]{6,32}$")
 
@@ -139,3 +140,38 @@ class LeadListOut(BaseModel):
     pinned: list[LeadOut]
     others: list[LeadOut]
     counts: LeadCounts
+
+
+class DiscussionCreate(BaseModel):
+    """Add a note. `follow_up_at` needs an offset; "after now" is checked in the service (R-4)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    body: str
+    follow_up_at: AwareDatetime | None = None
+
+    @field_validator("body")
+    @classmethod
+    def _body(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Note is required")
+        if len(v) > 5000:
+            raise ValueError("Note must be at most 5000 characters")
+        return v
+
+
+class DiscussionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    lead_id: uuid.UUID
+    kind: DiscussionKind
+    body: str
+    follow_up_at: UtcDatetime | None
+    created_at: UtcDatetime
+
+
+class AddDiscussionOut(BaseModel):
+    discussion: DiscussionOut
+    lead: LeadOut
