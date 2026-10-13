@@ -1,4 +1,4 @@
-"""Lead business logic: follow-up state (R-2), list, create, update (R-5)."""
+"""Lead business logic: follow-up state (R-2), list and pinning (R-3), create, update (R-5)."""
 
 import uuid
 from datetime import datetime
@@ -75,13 +75,16 @@ def _name_filter(q: str | None):  # noqa: ANN202
     return Lead.name.ilike(f"%{escaped}%", escape="\\")
 
 
+PINNED_STATES = ("overdue", "today")
+CLOSED_STATUSES = (LeadStatus.WON, LeadStatus.LOST)
+
+
 def list_leads(
     db: Session, now: datetime, tz: ZoneInfo, status: LeadStatus | None, q: str | None
 ) -> LeadListOut:
-    """Filtered list with counts (ARCHITECTURE.md, Load the list).
+    """Filtered list split into pinned and others, with counts (R-3, D-4).
 
-    Counts ignore the status filter but respect search (R-3). Pinning lands in S3;
-    until then every lead is returned in `others`, most recent activity first.
+    Counts ignore the status filter but respect search.
     """
     name_filter = _name_filter(q)
 
@@ -102,11 +105,39 @@ def list_leads(
     stmt = stmt.order_by(activity.desc(), Lead.id)
 
     _, day_end = local_day_bounds(now, tz)
-    others = [
-        _to_out(lead, follow_up_state(lead.next_follow_up_at, now, day_end))
+    rows = [
+        (lead, follow_up_state(lead.next_follow_up_at, now, day_end))
         for lead in db.scalars(stmt)
     ]
-    return LeadListOut(pinned=[], others=others, counts=counts)
+    pinned, others = order_for_list(rows)
+    return LeadListOut(
+        pinned=[_to_out(lead, state) for lead, state in pinned],
+        others=[_to_out(lead, state) for lead, state in others],
+        counts=counts,
+    )
+
+
+def order_for_list(
+    rows: list[tuple[Lead, str]],
+) -> tuple[list[tuple[Lead, str]], list[tuple[Lead, str]]]:
+    """Split and order leads for the list, see R-3.
+
+    `rows` arrive sorted by latest activity, newest first. Pinned holds overdue (D-5) and
+    today: all overdue first, then today, each by follow-up time ascending. Others keep the
+    activity order, with won and lost leads that have no follow-up moved to the end.
+    """
+    pinned = sorted(
+        (row for row in rows if row[1] in PINNED_STATES),
+        key=lambda row: (row[1] != "overdue", row[0].next_follow_up_at),
+    )
+    rest = [row for row in rows if row[1] not in PINNED_STATES]
+
+    def sinks(row: tuple[Lead, str]) -> bool:
+        lead = row[0]
+        return lead.status in CLOSED_STATUSES and lead.next_follow_up_at is None
+
+    others = [row for row in rest if not sinks(row)] + [row for row in rest if sinks(row)]
+    return pinned, others
 
 
 def create_lead(db: Session, data: LeadCreate, now: datetime) -> Lead:

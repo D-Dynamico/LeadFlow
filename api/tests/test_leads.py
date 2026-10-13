@@ -104,11 +104,13 @@ def test_list_state_uses_request_timezone(
 ) -> None:
     make_lead(next_follow_up_at=fixed_now.replace(hour=18, minute=45))
 
-    def state(tz: str) -> str:
-        return client.get(f"/api/v1/leads?tz={tz}").json()["others"][0]["follow_up_state"]
+    def section_and_state(tz: str) -> tuple[str, str]:
+        body = client.get(f"/api/v1/leads?tz={tz}").json()
+        section = "pinned" if body["pinned"] else "others"
+        return section, body[section][0]["follow_up_state"]
 
-    assert state("Asia/Kolkata") == "upcoming"
-    assert state("UTC") == "today"
+    assert section_and_state("Asia/Kolkata") == ("others", "upcoming")
+    assert section_and_state("UTC") == ("pinned", "today")
 
 
 def test_patch_status_persists_and_keeps_follow_up(
