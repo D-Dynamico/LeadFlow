@@ -83,6 +83,7 @@ export function AddLeadDialog({ open, onOpenChange }: Props) {
           <Field id="lead-name" label="Name" error={errors.name?.message}>
             <Input
               id="lead-name"
+              placeholder="e.g. Ravi Sharma"
               autoFocus
               autoComplete="off"
               aria-invalid={Boolean(errors.name)}
@@ -92,6 +93,7 @@ export function AddLeadDialog({ open, onOpenChange }: Props) {
           <Field id="lead-company" label="Company (optional)" error={errors.company?.message}>
             <Input
               id="lead-company"
+              placeholder="e.g. Acme Logistics"
               autoComplete="off"
               aria-invalid={Boolean(errors.company)}
               {...form.register("company")}
@@ -100,6 +102,7 @@ export function AddLeadDialog({ open, onOpenChange }: Props) {
           <Field id="lead-phone" label="Phone (optional)" error={errors.phone?.message}>
             <Input
               id="lead-phone"
+              placeholder="e.g. +91 98765 43210"
               type="tel"
               autoComplete="off"
               aria-invalid={Boolean(errors.phone)}
