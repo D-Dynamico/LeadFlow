@@ -159,6 +159,8 @@ Mobile: rows stack, dialog becomes full height. Keyboard: `N` opens Add Lead. To
 ## Edge cases
 
 - Lead with no discussions: last note shows "No notes yet", time ago uses `created_at`.
+- Timeline always ends with a "Lead created" line built from the lead's `created_at` on the client;
+  it is not a stored discussion, so a new lead's timeline is never empty.
 - Long note: list shows the 200-char preview with ellipsis; timeline shows full text with line breaks.
 - Invalid or missing `tz`: 422 `INVALID_TIMEZONE`. Web always sends it.
 - Follow-up exactly at the current minute: treated as today, not overdue, until it passes (R-2).

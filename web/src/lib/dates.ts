@@ -36,6 +36,13 @@ export function formatFollowUp(iso: string, tz: string, now: Date = new Date()):
   return formatInTimeZone(date, tz, sameYear ? "EEE d MMM, h:mm a" : "d MMM yyyy, h:mm a");
 }
 
+/** Timeline stamp in the viewer's zone: "Oct 12, 10:30 AM", with the year when it differs. */
+export function formatTimestamp(iso: string, tz: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  const sameYear = formatInTimeZone(date, tz, "yyyy") === formatInTimeZone(now, tz, "yyyy");
+  return formatInTimeZone(date, tz, sameYear ? "MMM d, h:mm a" : "MMM d yyyy, h:mm a");
+}
+
 const at10am = (day: Date) => setHours(startOfDay(day), 10);
 
 /** Follow-up shortcuts in the viewer's local time (ARCHITECTURE.md, Components). */

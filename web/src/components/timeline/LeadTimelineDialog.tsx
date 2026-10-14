@@ -17,7 +17,7 @@ import { useDiscussions, useLead } from "@/hooks/useLeads";
 import { ApiError } from "@/lib/api";
 
 import { AddDiscussionForm } from "./AddDiscussionForm";
-import { DiscussionItem } from "./DiscussionItem";
+import { DiscussionItem, LeadCreatedItem } from "./DiscussionItem";
 import { MarkFollowUpDoneButton } from "./MarkFollowUpDoneButton";
 import { StatusSelect } from "./StatusSelect";
 
@@ -85,17 +85,17 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
             </div>
           )}
           {discussions.data ? (
-            discussions.data.length > 0 ? (
-              <ol className="divide-y" aria-label="Timeline">
-                {discussions.data.map((discussion) => (
-                  <DiscussionItem key={discussion.id} discussion={discussion} tz={tz} />
-                ))}
-              </ol>
-            ) : (
-              <p className="py-6 text-center text-sm text-muted-foreground">
-                No discussions yet.
-              </p>
-            )
+            <ol className="py-5" aria-label="Timeline">
+              {discussions.data.map((discussion, index) => (
+                <DiscussionItem
+                  key={discussion.id}
+                  discussion={discussion}
+                  tz={tz}
+                  latest={index === 0}
+                />
+              ))}
+              {lead.data && <LeadCreatedItem createdAt={lead.data.created_at} tz={tz} />}
+            </ol>
           ) : discussions.error && !notFound ? (
             // Shown only when nothing is cached; a failed refetch keeps the timeline.
             <div className="py-6 text-center text-sm">
