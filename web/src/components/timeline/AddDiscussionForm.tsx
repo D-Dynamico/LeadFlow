@@ -11,19 +11,35 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAddDiscussion } from "@/hooks/useLeadMutations";
 import { ApiError } from "@/lib/api";
-import { fromDateTimeLocal, quickPicks, toDateTimeLocal } from "@/lib/dates";
+import {
+  DEFAULT_FOLLOW_UP_TIME,
+  fromDateAndTimeInputs,
+  quickPicks,
+  toDateAndTimeInputs,
+} from "@/lib/dates";
 
 // Mirrors POST /leads/{id}/discussions validation (API.md); the API stays the authority.
-const schema = z.object({
-  body: z
-    .string()
-    .trim()
-    .min(1, "Write a note first")
-    .max(5000, "Notes are limited to 5000 characters"),
-  followUpAt: z
-    .string()
-    .refine((value) => !value || new Date(value) > new Date(), "Pick a time in the future"),
-});
+// The follow-up is entered as a local date and time and sent as one `follow_up_at`.
+const schema = z
+  .object({
+    body: z
+      .string()
+      .trim()
+      .min(1, "Write a note first")
+      .max(5000, "Notes are limited to 5000 characters"),
+    followUpDate: z.string(),
+    followUpTime: z.string(),
+  })
+  .superRefine(({ followUpDate, followUpTime }, ctx) => {
+    if (!followUpDate && !followUpTime) return;
+    if (!followUpDate) {
+      ctx.addIssue({ code: "custom", path: ["followUpDate"], message: "Pick a date" });
+    } else if (!followUpTime) {
+      ctx.addIssue({ code: "custom", path: ["followUpTime"], message: "Pick a time" });
+    } else if (new Date(`${followUpDate}T${followUpTime}`) <= new Date()) {
+      ctx.addIssue({ code: "custom", path: ["followUpTime"], message: "Pick a time in the future" });
+    }
+  });
 
 type Values = z.infer<typeof schema>;
 
@@ -31,24 +47,28 @@ export function AddDiscussionForm({ leadId }: { leadId: string }) {
   const addDiscussion = useAddDiscussion(leadId);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { body: "", followUpAt: "" },
+    defaultValues: { body: "", followUpDate: "", followUpTime: "" },
   });
   const { errors } = form.formState;
-  const followUpAt = useWatch({ control: form.control, name: "followUpAt" });
+  const [followUpDate, followUpTime] = useWatch({
+    control: form.control,
+    name: ["followUpDate", "followUpTime"],
+  });
+  const followUpError = errors.followUpDate ?? errors.followUpTime;
 
-  const submit = form.handleSubmit(async ({ body, followUpAt }) => {
+  const submit = form.handleSubmit(async ({ body, followUpDate, followUpTime }) => {
     try {
       await addDiscussion.mutateAsync({
         body,
-        ...(followUpAt && { follow_up_at: fromDateTimeLocal(followUpAt) }),
+        ...(followUpDate && { follow_up_at: fromDateAndTimeInputs(followUpDate, followUpTime) }),
       });
       form.reset();
     } catch (error) {
       if (error instanceof ApiError && error.code === "FOLLOW_UP_IN_PAST") {
-        form.setError("followUpAt", { message: error.message });
+        form.setError("followUpTime", { message: error.message });
       } else if (error instanceof ApiError && error.details?.length) {
         for (const { field, message } of error.details) {
-          form.setError(field === "follow_up_at" ? "followUpAt" : "body", { message });
+          form.setError(field === "follow_up_at" ? "followUpTime" : "body", { message });
         }
       } else {
         toast.error(error instanceof Error ? error.message : "Could not save the note");
@@ -56,8 +76,12 @@ export function AddDiscussionForm({ leadId }: { leadId: string }) {
     }
   });
 
-  const pickFollowUp = (value: string) =>
-    form.setValue("followUpAt", value, { shouldValidate: true, shouldDirty: true });
+  const pickFollowUp = (date: string, time: string) => {
+    const options = { shouldDirty: true };
+    form.setValue("followUpDate", date, options);
+    form.setValue("followUpTime", time, options);
+    void form.trigger(["followUpDate", "followUpTime"]);
+  };
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3" noValidate>
@@ -86,31 +110,47 @@ export function AddDiscussionForm({ leadId }: { leadId: string }) {
         <div className="flex flex-wrap items-center gap-2">
           <Input
             id="note-follow-up"
-            type="datetime-local"
+            type="date"
             className="w-auto"
-            aria-invalid={Boolean(errors.followUpAt)}
-            {...form.register("followUpAt")}
+            aria-invalid={Boolean(errors.followUpDate)}
+            {...form.register("followUpDate", {
+              onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                if (event.target.value && !form.getValues("followUpTime")) {
+                  form.setValue("followUpTime", DEFAULT_FOLLOW_UP_TIME);
+                }
+              },
+            })}
           />
-          {quickPicks().map(({ label, date }) => (
-            <Button
-              key={label}
-              type="button"
-              variant="outline"
-              size="sm"
-              title={toDateTimeLocal(date).replace("T", " ")}
-              onClick={() => pickFollowUp(toDateTimeLocal(date))}
-            >
-              {label}
-            </Button>
-          ))}
-          {followUpAt && (
-            <Button type="button" variant="ghost" size="sm" onClick={() => pickFollowUp("")}>
+          <Input
+            type="time"
+            aria-label="Follow-up time"
+            className="w-auto"
+            aria-invalid={Boolean(errors.followUpTime)}
+            {...form.register("followUpTime")}
+          />
+          {quickPicks().map(({ label, date }) => {
+            const inputs = toDateAndTimeInputs(date);
+            return (
+              <Button
+                key={label}
+                type="button"
+                variant="outline"
+                size="sm"
+                title={`${inputs.date} ${inputs.time}`}
+                onClick={() => pickFollowUp(inputs.date, inputs.time)}
+              >
+                {label}
+              </Button>
+            );
+          })}
+          {(followUpDate || followUpTime) && (
+            <Button type="button" variant="ghost" size="sm" onClick={() => pickFollowUp("", "")}>
               Clear
             </Button>
           )}
         </div>
-        {errors.followUpAt ? (
-          <p className="text-xs text-destructive">{errors.followUpAt.message}</p>
+        {followUpError ? (
+          <p className="text-xs text-destructive">{followUpError.message}</p>
         ) : (
           <p className="text-xs text-muted-foreground">
             Leaving this empty clears the current follow-up.

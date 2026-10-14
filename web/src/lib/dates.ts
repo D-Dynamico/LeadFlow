@@ -47,12 +47,15 @@ export function quickPicks(now: Date = new Date()): { label: string; date: Date 
   ];
 }
 
-/** Value for an `<input type="datetime-local">`, in the browser's local time. */
-export function toDateTimeLocal(date: Date): string {
-  return format(date, "yyyy-MM-dd'T'HH:mm");
+/** Default follow-up time when only a date is picked. */
+export const DEFAULT_FOLLOW_UP_TIME = "10:00";
+
+/** Values for `<input type="date">` and `<input type="time">`, in the browser's local time. */
+export function toDateAndTimeInputs(date: Date): { date: string; time: string } {
+  return { date: format(date, "yyyy-MM-dd"), time: format(date, "HH:mm") };
 }
 
-/** A `datetime-local` value to ISO 8601 UTC, which carries the offset the API requires. */
-export function fromDateTimeLocal(value: string): string {
-  return new Date(value).toISOString();
+/** Local date and time input values to ISO 8601 UTC, which carries the offset the API requires. */
+export function fromDateAndTimeInputs(date: string, time: string): string {
+  return new Date(`${date}T${time}`).toISOString();
 }
