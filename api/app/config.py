@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     test_database_url: str = "postgresql+psycopg://leadflow:leadflow@localhost:5433/leadflow_test"
     frontend_origin: str = "http://localhost:3000"
     seed_on_start: bool = False
+    reseed_after_hours: float = 6
     log_level: str = "info"
 
 

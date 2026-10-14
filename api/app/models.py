@@ -68,3 +68,12 @@ class Discussion(Base):
 
 
 Index("ix_discussions_lead_id_created_at", Discussion.lead_id, Discussion.created_at.desc())
+
+
+class AppMeta(Base):
+    """Single row of deployment state; `seeded_at` drives the demo reseed, see D-16."""
+
+    __tablename__ = "app_meta"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    seeded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

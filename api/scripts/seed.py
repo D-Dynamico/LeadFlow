@@ -1,9 +1,10 @@
 """Demo data relative to now, see TEST_PLAN.md Fixtures and seed data.
 
-Usage: python -m scripts.seed [--reset] [--tz Asia/Kolkata]
+Usage: python -m scripts.seed [--reset | --if-stale] [--tz Asia/Kolkata]
 
 Without --reset it does nothing when leads already exist, so it is safe on every
-container start. "Later today" and "earlier today" are placed inside the local day
+container start. --if-stale resets only when the last seed is older than
+RESEED_AFTER_HOURS (D-16), so a deployed demo keeps correct follow-up states. "Later today" and "earlier today" are placed inside the local day
 of --tz, so every follow-up state (R-2) shows up for a viewer in that zone.
 """
 
@@ -15,8 +16,9 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.db import SessionLocal
-from app.models import Discussion, DiscussionKind, Lead, LeadStatus
+from app.models import AppMeta, Discussion, DiscussionKind, Lead, LeadStatus
 from app.services.discussions import PREVIEW_LENGTH
 from app.services.leads import status_change_body
 from app.timeutil import local_day_bounds, resolve_tz, utcnow
@@ -209,19 +211,43 @@ def seed(db: Session, now: datetime, tz: ZoneInfo, reset: bool) -> int:
     elif db.scalar(select(func.count()).select_from(Lead)):
         return 0
     leads = [insert_lead(db, s) for s in build_leads(now.replace(microsecond=0), tz)]
+    db.merge(AppMeta(id=1, seeded_at=now))
     db.commit()
     return len(leads)
 
 
+def is_stale(seeded_at: datetime | None, now: datetime, max_age: timedelta) -> bool:
+    """A missing or old seed needs a reset, see D-16."""
+    return seeded_at is None or now - seeded_at > max_age
+
+
+def reseed_if_stale(db: Session, now: datetime, tz: ZoneInfo, max_age: timedelta) -> int:
+    """Reset the demo data only when the last seed is older than `max_age` (D-16)."""
+    meta = db.get(AppMeta, 1)
+    if not is_stale(meta.seeded_at if meta else None, now, max_age):
+        return 0
+    return seed(db, now, tz, reset=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Seed LeadFlow with demo leads.")
-    parser.add_argument("--reset", action="store_true", help="delete all leads first")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--reset", action="store_true", help="delete all leads first")
+    mode.add_argument(
+        "--if-stale", action="store_true", help="reset only if the last seed is RESEED_AFTER_HOURS old"
+    )
     parser.add_argument("--tz", default=DEFAULT_TZ, help=f"viewer timezone (default {DEFAULT_TZ})")
     args = parser.parse_args()
 
     with SessionLocal() as db:
-        added = seed(db, utcnow(), resolve_tz(args.tz), args.reset)
-    print(f"Seeded {added} leads." if added else "Leads already exist; skipped (use --reset).")
+        if args.if_stale:
+            max_age = timedelta(hours=get_settings().reseed_after_hours)
+            added = reseed_if_stale(db, utcnow(), resolve_tz(args.tz), max_age)
+            skipped = "Seed is fresh; skipped."
+        else:
+            added = seed(db, utcnow(), resolve_tz(args.tz), args.reset)
+            skipped = "Leads already exist; skipped (use --reset)."
+    print(f"Seeded {added} leads." if added else skipped)
 
 
 if __name__ == "__main__":
