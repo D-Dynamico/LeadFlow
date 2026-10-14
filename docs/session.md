@@ -14,8 +14,8 @@ Updated: Thu 15 Oct 2026. Deadline: Fri 16 Oct.
   (Singapore, PG 16, direct host). Every push to `main` redeploys both.
 - Add-note follow-up is separate date and time inputs (10:00 default, quick picks fill both,
   date without time is invalid); checked in Chrome locally.
-- HR mockups checked: every feature is covered. Timeline restyled to match (rail, dated note
-  cards, display-only "Lead created" entry); Add Lead fields have placeholders.
+- HR mockups covered: timeline rail with dated cards, display-only "Lead created" entry, note
+  form pinned below the timeline; Add Lead placeholders.
 
 ## Now
 - Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). Mobile check next.
