@@ -12,18 +12,17 @@ Updated: Thu 15 Oct 2026. Deadline: Fri 16 Oct.
 - Deployed per D-16: web https://leadflow-web-six.vercel.app (Vercel `leadflow-web`), API
   https://leadflow-api-ebse.onrender.com (Render `leadflow-api`, Singapore), Neon `LeadFlow`
   (Singapore, PG 16, direct host). Every push to `main` redeploys both.
+- Add-note follow-up is separate date and time inputs (10:00 default, quick picks fill both,
+  date without time is invalid); checked in Chrome locally.
 
 ## Now
-- Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). Deploy done; follow-up split next.
+- Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). Mobile check next.
 
 ## Next
-1. Split the add-note follow-up field (`AddDiscussionForm`) into separate date and
-   time inputs; time defaults to 10:00 when a date is picked, quick picks fill both, Clear empties
-   both, a date without a time is invalid. UI only; the API payload is unchanged.
-2. Mobile check (rows stack, dialog full height), empty and error states pass, small visual fixes.
-3. README: setup (Docker and manual), tests, seed, decisions summary linking DECISIONS.md, API
+1. Mobile check (rows stack, dialog full height), empty and error states pass, small visual fixes.
+2. README: setup (Docker and manual), tests, seed, decisions summary linking DECISIONS.md, API
    table, How I used AI, known limitations, next steps. Screenshots in `docs/screenshots/`.
-4. Walkthrough video (2 to 3 min), definition of done.
+3. Walkthrough video (2 to 3 min), definition of done.
 
 ## Notes
 - Mutation hooks live in `hooks/useLeadMutations.ts`; reads and query keys in `hooks/useLeads.ts`.
