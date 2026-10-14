@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { FollowUpChip } from "@/components/leads/FollowUpChip";
@@ -27,6 +27,13 @@ type Props = { leadId: string | null; tz: string; onClose: () => void };
 export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
   const lead = useLead(leadId, tz);
   const discussions = useDiscussions(leadId);
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  // Newest is first, so jump to the top when an entry is added (or another lead opens).
+  const entryCount = discussions.data?.length;
+  useEffect(() => {
+    timelineRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [entryCount, leadId]);
 
   // Unknown or deleted lead in the URL: close and clear the param (ARCHITECTURE.md, Edge cases).
   const notFound = [lead.error, discussions.error].some(
@@ -78,12 +85,12 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
           )}
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4">
-          {leadId && (
-            <div className="border-b py-4">
-              <AddDiscussionForm key={leadId} leadId={leadId} />
-            </div>
-          )}
+        {/* Timeline scrolls between the header and the pinned note form; the minimum height
+            keeps short timelines from collapsing the dialog. */}
+        <div
+          ref={timelineRef}
+          className="min-h-0 flex-1 overflow-y-auto bg-muted/30 px-4 sm:min-h-60"
+        >
           {discussions.data ? (
             <ol className="py-5" aria-label="Timeline">
               {discussions.data.map((discussion, index) => (
@@ -117,6 +124,12 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
             </div>
           )}
         </div>
+
+        {leadId && (
+          <div className="shrink-0 border-t bg-background p-4">
+            <AddDiscussionForm key={leadId} leadId={leadId} />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

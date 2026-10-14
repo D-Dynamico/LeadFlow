@@ -92,7 +92,7 @@ export function AddDiscussionForm({ leadId }: { leadId: string }) {
         <Textarea
           id="note-body"
           placeholder="What was discussed?"
-          rows={3}
+          rows={2}
           aria-invalid={Boolean(errors.body)}
           {...form.register("body")}
           onKeyDown={(event) => {
@@ -149,16 +149,17 @@ export function AddDiscussionForm({ leadId }: { leadId: string }) {
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Follow-up hint or error shares the row with the submit button to keep the form short. */}
+      <div className="flex items-center gap-3">
         {followUpError ? (
-          <p className="text-xs text-destructive">{followUpError.message}</p>
+          <p className="flex-1 text-xs text-destructive">{followUpError.message}</p>
         ) : (
-          <p className="text-xs text-muted-foreground">
+          <p className="flex-1 text-xs text-muted-foreground">
             Leaving this empty clears the current follow-up.
           </p>
         )}
-      </div>
-
-      <div className="flex items-center justify-end gap-3">
         <span className="hidden text-xs text-muted-foreground sm:inline">Ctrl/⌘ + Enter</span>
         <Button type="submit" disabled={addDiscussion.isPending}>
           {addDiscussion.isPending ? "Saving…" : "Add note"}
