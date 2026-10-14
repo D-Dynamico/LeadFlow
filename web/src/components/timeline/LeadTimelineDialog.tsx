@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Pencil } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { FollowUpChip } from "@/components/leads/FollowUpChip";
@@ -18,6 +19,7 @@ import { ApiError } from "@/lib/api";
 
 import { AddDiscussionForm } from "./AddDiscussionForm";
 import { DiscussionItem, LeadCreatedItem } from "./DiscussionItem";
+import { LeadDetailsForm } from "./LeadDetailsForm";
 import { MarkFollowUpDoneButton } from "./MarkFollowUpDoneButton";
 import { StatusSelect } from "./StatusSelect";
 
@@ -28,6 +30,9 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
   const lead = useLead(leadId, tz);
   const discussions = useDiscussions(leadId);
   const timelineRef = useRef<HTMLDivElement>(null);
+  // Keyed by lead id, so opening another lead always starts out of edit mode.
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editing = leadId !== null && editingId === leadId;
 
   // Newest is first, so jump to the top when an entry is added (or another lead opens).
   const entryCount = discussions.data?.length;
@@ -55,14 +60,35 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
         <DialogHeader className="gap-3 border-b p-4 pr-12">
           {lead.data ? (
             <>
-              <div className="flex flex-col gap-1">
-                <DialogTitle className="text-lg">{lead.data.name}</DialogTitle>
-                <DialogDescription>
-                  {[lead.data.company, lead.data.phone]
-                    .filter(Boolean)
-                    .join(" · ") || "No company or phone"}
-                </DialogDescription>
-              </div>
+              {editing ? (
+                <>
+                  <DialogTitle className="sr-only">Edit {lead.data.name}</DialogTitle>
+                  <DialogDescription className="sr-only">
+                    Change the name, company or phone.
+                  </DialogDescription>
+                  <LeadDetailsForm lead={lead.data} onDone={() => setEditingId(null)} />
+                </>
+              ) : (
+                <div className="flex items-start gap-2">
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <DialogTitle className="text-lg break-words">{lead.data.name}</DialogTitle>
+                    <DialogDescription>
+                      {[lead.data.company, lead.data.phone]
+                        .filter(Boolean)
+                        .join(" · ") || "No company or phone"}
+                    </DialogDescription>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0 text-muted-foreground"
+                    onClick={() => setEditingId(lead.data.id)}
+                  >
+                    <Pencil data-icon="inline-start" />
+                    Edit
+                  </Button>
+                </div>
+              )}
               <div className="flex flex-wrap items-center gap-2">
                 <StatusSelect leadId={lead.data.id} status={lead.data.status} />
                 <FollowUpChip lead={lead.data} tz={tz} />

@@ -124,6 +124,12 @@ into the list cache, and invalidates the list so pinning re-sorts ([Cache update
 Status select sends `PATCH /leads/{id}` with `{ status }`. Optimistic update in the list and dialog;
 rollback and toast on error. API writes the status_change entry (R-5) and returns the lead.
 
+### Edit lead details
+Edit in the dialog header turns name, company and phone into inputs (D-18). Save sends
+`PATCH /leads/{id}` with all three, a blank company or phone as `null`. Not optimistic: field errors
+from the API show on the inputs. On success web writes the details into the lead and list caches and
+invalidates both. Cancel or Escape leaves edit mode without closing the dialog. No timeline entry.
+
 ### Add a lead
 Dialog posts `{ name, company?, phone? }` to `POST /leads`. 201 with the lead. Web invalidates the list.
 
@@ -140,7 +146,10 @@ One route, feature folders under `components/`, one API client, hooks per resour
 - `LeadList`: Pinned section then All section; skeletons and empty states
 - `LeadRow`: name, company, `StatusBadge`, last note preview, time ago, `FollowUpChip`
 - `FollowUpChip`: overdue red, today amber, upcoming neutral (state comes from the API, R-2)
-- `LeadTimelineDialog`: header with name and `StatusSelect`, `DiscussionItem` list, `AddDiscussionForm`
+- `LeadTimelineDialog`: header with name, Edit button and `StatusSelect`, scrolling `DiscussionItem`
+  list, `AddDiscussionForm` pinned below
+- `LeadDetailsForm`: inline name, company, phone inputs with Save and Cancel (D-18); shares the
+  Add Lead schema from `lib/leadForm.ts`
 - `AddDiscussionForm`: textarea, separate date and time inputs (a date alone defaults to 10:00),
   quick picks at 10:00 local (Tomorrow, In 3 days, Next Monday; on a Monday that is a week later,
   D-17), Cmd/Ctrl+Enter submits. Date math lives in `lib/dates.ts`, not in components.

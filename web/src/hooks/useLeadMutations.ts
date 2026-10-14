@@ -15,6 +15,7 @@ import type {
   LeadCreateInput,
   LeadList,
   LeadStatus,
+  LeadUpdateInput,
 } from "@/lib/types";
 
 /** Update a lead's row in every cached list, so the list changes without a refetch. */
@@ -84,6 +85,25 @@ export function useUpdateStatus(leadId: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: leadKey(leadId) });
       void queryClient.invalidateQueries({ queryKey: discussionsKey(leadId) });
+      void queryClient.invalidateQueries({ queryKey: ["leads"] });
+    },
+  });
+}
+
+/**
+ * Save edited name, company and phone (ARCHITECTURE.md, Edit lead details; D-18). Not
+ * optimistic: the form waits so field errors can show. Only the details are written into the
+ * caches, because PATCH computes follow_up_state in UTC; then lead and lists refetch.
+ */
+export function useUpdateLeadDetails(leadId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: LeadUpdateInput) => api.updateLead(leadId, input),
+    onSuccess: ({ name, company, phone }) => {
+      const details = (lead: Lead) => ({ ...lead, name, company, phone });
+      queryClient.setQueryData<Lead>(leadKey(leadId), (lead) => lead && details(lead));
+      updateLeadInLists(queryClient, leadId, details);
+      void queryClient.invalidateQueries({ queryKey: leadKey(leadId) });
       void queryClient.invalidateQueries({ queryKey: ["leads"] });
     },
   });

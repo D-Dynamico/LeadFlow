@@ -86,6 +86,15 @@ separately. From here on, web-only logic changes need a Vitest test; purely visu
 the manual check in the commit body. "Next Monday 10 AM" always means the coming week's Monday,
 also on a Monday: 10 AM today is often past, and "Tomorrow 10 AM" covers the short term.
 
+### D-18 Edit lead details inline in the dialog header, saved without optimism
+Alternatives: a separate Edit Lead dialog; optimistic save like the status select; sending only
+changed fields; leaving a blank company or phone out of the PATCH. Why: an Edit button in the
+header keeps the timeline in view and needs no second dialog. Save waits for the response so
+validation errors land on the fields; status stays optimistic because it cannot fail validation.
+The form sends name, company and phone together, with a blank company or phone as `null` so it
+clears; the API ignores unchanged values. Editing details writes no timeline entry: only status
+changes are logged (R-5). The form reuses the Add Lead schema (`lib/leadForm.ts`).
+
 ## Open
 
 - None. The deploy target was decided in D-16.

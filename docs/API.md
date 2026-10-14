@@ -25,6 +25,9 @@ Validation:
 - `company`: optional, up to 120 chars, empty string becomes null
 - `phone`: optional, matches `^[0-9+\-\s()]{6,32}$`, empty string becomes null
 - `status`: one of the enum values
+- `PATCH /leads/{id}`: send only the fields to change. `name` cannot be null or blank; `company` and
+  `phone` accept `null` or a blank string to clear. Unchanged values are a no-op, with no
+  `updated_at` bump. Only a status change writes a timeline entry (R-5); editing details does not.
 - `body` (note): required, trimmed, 1 to 5000 chars
 - `follow_up_at`: optional, timezone-aware datetime, must be after now (R-4)
 - `q`: optional, trimmed, case-insensitive substring of `name`

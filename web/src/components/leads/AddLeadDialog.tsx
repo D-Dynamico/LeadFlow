@@ -1,11 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
+import { LeadField as Field } from "@/components/leads/LeadField";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,32 +15,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useCreateLead } from "@/hooks/useLeadMutations";
 import { ApiError } from "@/lib/api";
-
-// Mirrors POST /leads validation (API.md); the API stays the authority.
-const schema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120, "At most 120 characters"),
-  company: z.string().trim().max(120, "At most 120 characters"),
-  phone: z
-    .string()
-    .trim()
-    .refine(
-      (value) => !value || /^[0-9+\-\s()]{6,32}$/.test(value),
-      "6 to 32 digits, spaces, or + - ( )",
-    ),
-});
-
-type Values = z.infer<typeof schema>;
-const FIELDS = ["name", "company", "phone"] as const;
+import { leadFormField, leadFormSchema, type LeadFormValues } from "@/lib/leadForm";
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 
 export function AddLeadDialog({ open, onOpenChange }: Props) {
   const createLead = useCreateLead();
-  const form = useForm<Values>({
-    resolver: zodResolver(schema),
+  const form = useForm<LeadFormValues>({
+    resolver: zodResolver(leadFormSchema),
     defaultValues: { name: "", company: "", phone: "" },
   });
   const { errors } = form.formState;
@@ -62,8 +45,7 @@ export function AddLeadDialog({ open, onOpenChange }: Props) {
     } catch (error) {
       if (error instanceof ApiError && error.details?.length) {
         for (const { field, message } of error.details) {
-          const name = FIELDS.find((f) => f === field) ?? "name";
-          form.setError(name, { message });
+          form.setError(leadFormField(field), { message });
         }
       } else {
         toast.error(error instanceof Error ? error.message : "Could not add the lead");
@@ -121,17 +103,5 @@ export function AddLeadDialog({ open, onOpenChange }: Props) {
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-type FieldProps = { id: string; label: string; error?: string; children: ReactNode };
-
-function Field({ id, label, error, children }: FieldProps) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-    </div>
   );
 }

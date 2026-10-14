@@ -65,6 +65,13 @@ Covers R-5.
 - same status again creates no entry
 - status change does not touch `last_note_preview` or `next_follow_up_at`
 
+### Lead details
+Covers [Endpoints](API.md#endpoints) PATCH and D-18 (`test_lead_details.py`).
+- PATCH saves trimmed name, company, phone; writes no timeline entry; follow-up and last note untouched
+- `null`, empty or blank company and phone clear them
+- unchanged details do not bump `updated_at`
+- invalid phone returns 422 with `details[0].field == "phone"`
+
 ### Web unit tests
 Vitest with jsdom (D-17), run with `cd web && npm test`. `TZ` is pinned to `America/New_York`.
 - `timeAgo`: "just now" inside a minute either side; otherwise measured from the given `now`
@@ -77,6 +84,9 @@ Vitest with jsdom (D-17), run with `cd web && npm test`. `TZ` is pinned to `Amer
   as future
 - Add Lead form: submitting an empty name shows "Name is required", marks the field invalid, and
   sends no request
+- `lib/leadForm.ts`: schema errors; blank company or phone become `null` in the PATCH body (D-18)
+- Edit lead form: cleared name shows an error and sends nothing; a saved edit sends `PATCH` with
+  `phone: null` and closes; Escape cancels without saving
 
 Web-only logic changes need a test here; purely visual changes note the manual check in the commit.
 
@@ -104,3 +114,7 @@ Break the code on purpose; the named test must fail. Revert after each check. Ru
 | Next Monday returns today on a Monday | Web: `quickPicks` Next Monday on a Monday |
 | 10 AM computed as midnight + 10 hours | Web: `quickPicks` across the DST change |
 | Drop the required check on the lead name | Web: Add Lead form empty name |
+| Log a status_change for every edited field | Lead details: no timeline entry |
+| Keep a blank company as an empty string | Lead details: blank clears |
+| Send a blank phone as `""` instead of `null` | Web: `toLeadUpdate`, edit form saves |
+| Escape no longer cancels the edit | Web: edit form Escape |
