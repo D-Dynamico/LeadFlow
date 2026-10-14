@@ -66,6 +66,15 @@ Alternatives: keep 5432; ask developers to stop their native Postgres. Why: a na
 Docker db. `POSTGRES_HOST_PORT` (default 5433) moves only the host side; containers still use
 `db:5432`.
 
+### D-16 Deploy on Vercel + Render + Neon; reseed demo data only when stale
+Alternatives: skip the live link; Render's own Postgres (free tier expires after 30 days); seed
+once and let data drift; reset on every cold start. Why: free tiers that last past grading. The
+seed is relative to when it runs, so a seed left alone shows every pinned lead as overdue within a
+day, which looks like a pinning bug. Resetting on every cold start wipes a reviewer's edits after
+15 idle minutes. Instead the Render start command runs `python -m scripts.seed --if-stale`, which
+resets only when `app_meta.seeded_at` is missing or older than `RESEED_AFTER_HOURS` (default 6).
+Local Docker keeps `SEED_ON_START` (seed once, never reset).
+
 ## Open
 
-- Deploy target for the live link: Vercel + Render/Railway, or skip. Decide on Day 3.
+- None. The deploy target was decided in D-16.

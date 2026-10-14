@@ -3,6 +3,14 @@
 A single-screen lead management mini CRM. Track leads, log every discussion in a timeline, and set
 follow-up reminders. Today's and overdue follow-ups are pinned to the top of the list.
 
+## Live demo
+
+- Web: TODO after deploy
+- API: TODO after deploy
+
+Demo data refreshes when it's more than 6 hours old. The free API sleeps when idle, so the first
+request can take about a minute.
+
 ## Stack
 
 - `api/`: FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, Postgres 16, pytest
