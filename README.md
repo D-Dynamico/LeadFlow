@@ -5,8 +5,8 @@ follow-up reminders. Today's and overdue follow-ups are pinned to the top of the
 
 ## Live demo
 
-- Web: TODO after deploy
-- API: TODO after deploy
+- Web: https://leadflow-web-six.vercel.app
+- API: https://leadflow-api-ebse.onrender.com/api/v1 (docs: https://leadflow-api-ebse.onrender.com/docs)
 
 Demo data refreshes when it's more than 6 hours old. The free API sleeps when idle, so the first
 request can take about a minute.
