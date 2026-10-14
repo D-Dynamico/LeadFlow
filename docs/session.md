@@ -3,15 +3,18 @@
 Updated: Thu 15 Oct 2026. Deadline: Fri 16 Oct.
 
 ## Done
-- S1 to S5 complete: API (68 pytest tests, mutation checks pass), list, filters, URL state, timeline
+- S1 to S5 complete: API (74 pytest tests, mutation checks pass), list, filters, URL state, timeline
   dialog, mutations, Add Lead with `N`. Every functional rubric item works.
 - Deployed per D-16: web https://leadflow-web-six.vercel.app (Vercel `leadflow-web`), API
   https://leadflow-api-ebse.onrender.com (Render `leadflow-api`, Singapore), Neon `LeadFlow`
   (Singapore, PG 16). Stale-only reseed via `scripts.seed --if-stale`. Push to `main` redeploys both.
 - HR mockups covered: split date and time follow-up inputs, timeline rail with dated cards and a
   display-only "Lead created" entry, note form pinned below the timeline, Add Lead placeholders.
-- Web unit tests per D-17: Vitest 4 + Testing Library, `cd web && npm test` (16 tests: `lib/dates.ts`
-  and the Add Lead empty-name error). TZ pinned to America/New_York. Awaiting commit approval.
+- Web unit tests per D-17: Vitest 4 + Testing Library, `cd web && npm test` (23 tests). TZ pinned
+  to America/New_York.
+- Edit lead details per D-18: Edit button in the dialog header, inline name/company/phone with
+  Save and Cancel, blank clears via `null`, no timeline entry. API PATCH now has tests
+  (`test_lead_details.py`). Checked in Chrome locally.
 
 ## Now
 - Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). Mobile check next.
