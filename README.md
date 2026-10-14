@@ -59,8 +59,11 @@ npm run dev
 
 ```
 cd api && pytest
+cd web && npm test
 cd web && npm run lint && npx tsc --noEmit
 ```
+
+Web tests use Vitest with the time zone pinned to `America/New_York` (D-17).
 
 ## Seed data
 

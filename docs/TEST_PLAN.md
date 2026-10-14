@@ -65,6 +65,21 @@ Covers R-5.
 - same status again creates no entry
 - status change does not touch `last_note_preview` or `next_follow_up_at`
 
+### Web unit tests
+Vitest with jsdom (D-17), run with `cd web && npm test`. `TZ` is pinned to `America/New_York`.
+- `timeAgo`: "just now" inside a minute either side; otherwise measured from the given `now`
+- `formatFollowUp`: today, tomorrow, yesterday in the given zone; near midnight in `Asia/Kolkata`
+  vs `UTC`; year shown only when it differs; 10:00 on the New York DST day is `15:00Z`
+- `formatTimestamp`: month, day, time; year only when it differs in the viewer's zone
+- `quickPicks`: Tomorrow 10 AM from 23:30 is the next day; Next Monday on a Monday is a week later;
+  Tomorrow 10 AM from 23:30 EDT on Sat 31 Oct is `2026-11-01T15:00:00Z` (EST)
+- date and time inputs: local values convert to UTC with the right offset; only later times count
+  as future
+- Add Lead form: submitting an empty name shows "Name is required", marks the field invalid, and
+  sends no request
+
+Web-only logic changes need a test here; purely visual changes note the manual check in the commit.
+
 ### Web manual checklist
 Run in S5 and S6.
 - add note with follow-up for later today: row moves into Pinned without a page reload
@@ -85,3 +100,7 @@ Break the code on purpose; the named test must fail. Revert after each check. Ru
 | Skip clearing the follow-up on a note without one | Discussions: note without follow-up clears it |
 | Commit the discussion before updating the lead, then raise | Discussions: past date writes nothing |
 | Remove the custom 422 handler | Leads endpoints: empty name envelope |
+| `timeAgo` measures from the real clock | Web: `timeAgo` measures from the given now |
+| Next Monday returns today on a Monday | Web: `quickPicks` Next Monday on a Monday |
+| 10 AM computed as midnight + 10 hours | Web: `quickPicks` across the DST change |
+| Drop the required check on the lead name | Web: Add Lead form empty name |

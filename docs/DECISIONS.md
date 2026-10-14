@@ -75,6 +75,17 @@ day, which looks like a pinning bug. Resetting on every cold start wipes a revie
 resets only when `app_meta.seeded_at` is missing or older than `RESEED_AFTER_HOURS` (default 6).
 Local Docker keeps `SEED_ON_START` (seed once, never reset).
 
+### D-17 Vitest and Testing Library for web unit tests
+Alternatives: no web tests, manual checks only; Vitest 5, which needs `@types/node` 22+ (the
+project has 20); `@vitejs/plugin-react`, whose Babel peer dependency conflicts. Why: the follow-up
+quick picks and date inputs run in the browser's own time zone, which pytest never sees, so they
+need real tests. Vitest 4 with jsdom, `@testing-library/react`, `user-event` and `jest-dom`; the
+runner pins `TZ=America/New_York` so results are the same on every machine and DST can be tested.
+Scope stays small: `lib/dates.ts` plus one Add Lead form test. End-to-end flows are covered
+separately. From here on, web-only logic changes need a Vitest test; purely visual changes note
+the manual check in the commit body. "Next Monday 10 AM" always means the coming week's Monday,
+also on a Monday: 10 AM today is often past, and "Tomorrow 10 AM" covers the short term.
+
 ## Open
 
 - None. The deploy target was decided in D-16.

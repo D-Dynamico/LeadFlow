@@ -14,6 +14,7 @@ import { ApiError } from "@/lib/api";
 import {
   DEFAULT_FOLLOW_UP_TIME,
   fromDateAndTimeInputs,
+  isFutureDateAndTime,
   quickPicks,
   toDateAndTimeInputs,
 } from "@/lib/dates";
@@ -36,7 +37,7 @@ const schema = z
       ctx.addIssue({ code: "custom", path: ["followUpDate"], message: "Pick a date" });
     } else if (!followUpTime) {
       ctx.addIssue({ code: "custom", path: ["followUpTime"], message: "Pick a time" });
-    } else if (new Date(`${followUpDate}T${followUpTime}`) <= new Date()) {
+    } else if (!isFutureDateAndTime(followUpDate, followUpTime)) {
       ctx.addIssue({ code: "custom", path: ["followUpTime"], message: "Pick a time in the future" });
     }
   });

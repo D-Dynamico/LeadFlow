@@ -2,7 +2,7 @@ import {
   addDays,
   differenceInCalendarDays,
   format,
-  formatDistanceToNowStrict,
+  formatDistanceStrict,
   nextMonday,
   setHours,
   startOfDay,
@@ -14,11 +14,11 @@ export function browserTimeZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 }
 
-/** "just now", "5 minutes ago", "3 days ago". */
+/** "just now", "5 minutes ago", "3 days ago", measured from `now`. */
 export function timeAgo(iso: string, now: Date = new Date()): string {
   const date = new Date(iso);
   if (Math.abs(now.getTime() - date.getTime()) < 60_000) return "just now";
-  return formatDistanceToNowStrict(date, { addSuffix: true });
+  return formatDistanceStrict(date, now, { addSuffix: true });
 }
 
 /**
@@ -45,7 +45,10 @@ export function formatTimestamp(iso: string, tz: string, now: Date = new Date())
 
 const at10am = (day: Date) => setHours(startOfDay(day), 10);
 
-/** Follow-up shortcuts in the viewer's local time (ARCHITECTURE.md, Components). */
+/**
+ * Follow-up shortcuts at 10:00 in the viewer's local time (ARCHITECTURE.md, Components).
+ * "Next Monday" is always the coming week's Monday, also when today is Monday (D-17).
+ */
 export function quickPicks(now: Date = new Date()): { label: string; date: Date }[] {
   return [
     { label: "Tomorrow 10 AM", date: at10am(addDays(now, 1)) },
@@ -65,4 +68,9 @@ export function toDateAndTimeInputs(date: Date): { date: string; time: string } 
 /** Local date and time input values to ISO 8601 UTC, which carries the offset the API requires. */
 export function fromDateAndTimeInputs(date: string, time: string): string {
   return new Date(`${date}T${time}`).toISOString();
+}
+
+/** Whether local date and time input values are later than `now`. */
+export function isFutureDateAndTime(date: string, time: string, now: Date = new Date()): boolean {
+  return new Date(`${date}T${time}`) > now;
 }

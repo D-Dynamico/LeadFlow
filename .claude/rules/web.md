@@ -17,4 +17,6 @@ paths:
   shadcn/ui primitives rather than custom widgets.
 - Forms use react-hook-form + zod schemas that mirror the API's validation (`docs/API.md#endpoints`).
 - TypeScript strict mode. No `any` in committed code.
-- Check `npm run lint` and `npx tsc --noEmit` before marking a task done.
+- Check `npm test`, `npm run lint` and `npx tsc --noEmit` before marking a task done.
+- Web-only logic changes need a Vitest test (D-17); purely visual changes note the manual check
+  in the commit body. Date math belongs in `lib/dates.ts`, not in components.

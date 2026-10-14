@@ -141,7 +141,9 @@ One route, feature folders under `components/`, one API client, hooks per resour
 - `LeadRow`: name, company, `StatusBadge`, last note preview, time ago, `FollowUpChip`
 - `FollowUpChip`: overdue red, today amber, upcoming neutral (state comes from the API, R-2)
 - `LeadTimelineDialog`: header with name and `StatusSelect`, `DiscussionItem` list, `AddDiscussionForm`
-- `AddDiscussionForm`: textarea, date-time input, quick picks (Tomorrow 10 AM, In 3 days, Next Monday 10 AM), Cmd/Ctrl+Enter submits
+- `AddDiscussionForm`: textarea, separate date and time inputs (a date alone defaults to 10:00),
+  quick picks at 10:00 local (Tomorrow, In 3 days, Next Monday; on a Monday that is a week later,
+  D-17), Cmd/Ctrl+Enter submits. Date math lives in `lib/dates.ts`, not in components.
 - `AddLeadDialog`
 
 ### URL state
