@@ -33,7 +33,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 ```
 
 Manual setup (without Docker) is also documented in the README: Python 3.12 venv for `api/`,
-Node 20 for `web/`, a local Postgres.
+Node 22.22+ for `web/` (jsdom for the web tests needs it; D-17), a local Postgres.
 
 ## Lead status lifecycle
 
@@ -88,7 +88,7 @@ Exit: the definition of done below is fully checked.
 
 - [ ] Fresh clone + `cp .env.example .env` + `docker compose up --build` works on a clean machine
 - [ ] All rubric items work by hand, including bonus items
-- [ ] `pytest` green; `npm run lint` and `npx tsc --noEmit` clean
+- [ ] `pytest` and `npm test` green (D-17); `npm run lint` and `npx tsc --noEmit` clean
 - [ ] README: setup (Docker and manual), tests, seed, decisions summary, API table, How I used AI,
       known limitations, next steps
 - [ ] `.env.example` lists every variable the code reads
