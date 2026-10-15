@@ -23,6 +23,10 @@ Features:
 Demo data refreshes when it's more than 6 hours old. The free API sleeps when idle, so the first
 request can take about a minute.
 
+## Walkthrough
+
+A 2-minute video of the app: https://www.loom.com/share/f790f983d48041a7949c3d06f28a4f29
+
 ## Screenshots
 
 Lead list, with today's and overdue follow-ups pinned to the top:

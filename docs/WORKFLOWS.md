@@ -92,6 +92,6 @@ Exit: the definition of done below is fully checked.
 - [ ] README: setup (Docker and manual), tests, seed, decisions summary, API table, How I used AI,
       known limitations, next steps
 - [ ] `.env.example` lists every variable the code reads
-- [ ] Screenshots in `docs/screenshots/`; walkthrough video (2 to 3 min) linked in README
+- [x] Screenshots in `docs/screenshots/`; walkthrough video (2 to 3 min) linked in README
 - [ ] Commit history is conventional, one idea per commit, no squash, no tool trailers
 - [ ] Repo is public; no secrets committed
