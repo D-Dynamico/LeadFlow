@@ -33,7 +33,7 @@ Fill these in as S1 creates them; keep this list accurate.
 - Seed: `cd api && python -m scripts.seed --reset`
 - Web dev: `cd web && npm run dev`
 - Web tests: `cd web && npm test`
-- Web lint/typecheck: `cd web && npm run lint && npx tsc --noEmit`
+- Web lint/typecheck: `cd web && npm run lint && npm run typecheck`
 
 ## How to work here
 

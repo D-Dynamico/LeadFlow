@@ -74,7 +74,7 @@ npm run dev                      # reads NEXT_PUBLIC_API_URL, default http://loc
 ```
 cd api && pytest                              # 74 tests against the leadflow_test database (D-2)
 cd web && npm test                            # 25 Vitest tests
-cd web && npm run lint && npx tsc --noEmit
+cd web && npm run lint && npm run typecheck   # typecheck generates Next route types first
 ```
 
 - API tests run on real Postgres, each in a rolled-back transaction, with `now` fixed so time-based
