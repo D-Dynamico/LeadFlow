@@ -156,7 +156,8 @@ changes were checked by hand in the browser. AI is not part of the product.
 
 ## Known limitations
 
-- Single user, no login (D-13); two tabs editing the same lead: the last write wins
+- Single user, no login (D-13): everyone on the live demo shares one database and sees the same
+  leads; two people editing the same lead: the last write wins
 - No pagination or search index (D-14); fine at demo scale, not for thousands of leads
 - Notes cannot be edited or deleted, and leads cannot be deleted
 - Live demo: the free API sleeps when idle, so the first request after a pause takes about a
