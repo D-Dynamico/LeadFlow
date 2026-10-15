@@ -10,8 +10,9 @@ export function MarkFollowUpDoneButton({ leadId }: { leadId: string }) {
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant="outline"
       size="sm"
+      className="shrink-0 bg-card/80 text-foreground"
       disabled={markDone.isPending}
       onClick={() => markDone.mutate()}
     >

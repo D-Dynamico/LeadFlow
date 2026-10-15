@@ -1,6 +1,6 @@
 "use client";
 
-import { STATUS_LABELS } from "@/components/leads/StatusBadge";
+import { STATUS_LABELS, StatusDot } from "@/components/leads/StatusBadge";
 import {
   Select,
   SelectContent,
@@ -23,12 +23,14 @@ export function StatusSelect({ leadId, status }: { leadId: string; status: LeadS
         if (value && value !== status) updateStatus.mutate(value);
       }}
     >
-      <SelectTrigger size="sm" aria-label="Lead status" className="min-w-36">
+      <SelectTrigger size="sm" aria-label="Lead status" className="min-w-40 gap-2 bg-card">
+        <StatusDot status={status} />
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
         {LEAD_STATUSES.map((value) => (
           <SelectItem key={value} value={value}>
+            <StatusDot status={value} />
             {STATUS_LABELS[value]}
           </SelectItem>
         ))}

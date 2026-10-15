@@ -1,10 +1,10 @@
 "use client";
 
-import { Pencil } from "lucide-react";
+import { Building2, Pencil, Phone } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { FollowUpChip } from "@/components/leads/FollowUpChip";
+import { LeadAvatar } from "@/components/leads/LeadAvatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +20,7 @@ import { ApiError } from "@/lib/api";
 import { AddDiscussionForm } from "./AddDiscussionForm";
 import { DiscussionItem, LeadCreatedItem } from "./DiscussionItem";
 import { LeadDetailsForm } from "./LeadDetailsForm";
-import { MarkFollowUpDoneButton } from "./MarkFollowUpDoneButton";
+import { FollowUpBanner } from "./FollowUpBanner";
 import { StatusSelect } from "./StatusSelect";
 
 type Props = { leadId: string | null; tz: string; onClose: () => void };
@@ -62,8 +62,8 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
       open={leadId !== null && !notFound}
       onOpenChange={(open) => !open && onClose()}
     >
-      <DialogContent className="flex h-dvh max-w-full flex-col gap-0 rounded-none p-0 sm:h-auto sm:max-h-[85vh] sm:max-w-2xl sm:rounded-xl">
-        <DialogHeader className="gap-3 border-b p-4 pr-12">
+      <DialogContent className="flex h-dvh max-w-full flex-col gap-0 rounded-none p-0 sm:h-auto sm:max-h-[85vh] sm:max-w-3xl sm:rounded-2xl overflow-hidden">
+        <DialogHeader className="gap-4 border-b p-4 pr-12 sm:py-5 sm:pr-14 sm:pl-6">
           {lead.data ? (
             <>
               {editing ? (
@@ -75,33 +75,48 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
                   <LeadDetailsForm lead={lead.data} onDone={() => setEditingId(null)} />
                 </>
               ) : (
-                <div className="flex items-start gap-2">
-                  <div className="flex min-w-0 flex-col gap-1">
-                    <DialogTitle className="text-lg break-words">{lead.data.name}</DialogTitle>
-                    <DialogDescription>
-                      {[lead.data.company, lead.data.phone]
-                        .filter(Boolean)
-                        .join(" · ") || "No company or phone"}
+                <div className="flex flex-wrap items-start gap-x-3.5 gap-y-3">
+                  <LeadAvatar id={lead.data.id} name={lead.data.name} size="lg" />
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <DialogTitle className="text-lg leading-tight font-semibold break-words">
+                        {lead.data.name}
+                      </DialogTitle>
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        className="shrink-0 text-muted-foreground"
+                        onClick={() => setEditingId(lead.data.id)}
+                      >
+                        <Pencil data-icon="inline-start" />
+                        Edit
+                      </Button>
+                    </div>
+                    <DialogDescription className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                      {lead.data.company && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <Building2 className="size-3.5" aria-hidden />
+                          {lead.data.company}
+                        </span>
+                      )}
+                      {lead.data.phone && (
+                        <a
+                          href={`tel:${lead.data.phone.replace(/[^\d+]/g, "")}`}
+                          className="inline-flex items-center gap-1.5 hover:text-foreground hover:underline"
+                        >
+                          <Phone className="size-3.5" aria-hidden />
+                          {lead.data.phone}
+                        </a>
+                      )}
+                      {!lead.data.company && !lead.data.phone && "No company or phone"}
                     </DialogDescription>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="shrink-0 text-muted-foreground"
-                    onClick={() => setEditingId(lead.data.id)}
-                  >
-                    <Pencil data-icon="inline-start" />
-                    Edit
-                  </Button>
+                  {/* Beside the name on wider screens, on its own line under it on phones. */}
+                  <div className="shrink-0 max-sm:basis-full max-sm:pl-[3.875rem] sm:self-center">
+                    <StatusSelect leadId={lead.data.id} status={lead.data.status} />
+                  </div>
                 </div>
               )}
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusSelect leadId={lead.data.id} status={lead.data.status} />
-                <FollowUpChip lead={lead.data} tz={tz} />
-                {lead.data.follow_up_state !== "none" && (
-                  <MarkFollowUpDoneButton leadId={lead.data.id} />
-                )}
-              </div>
             </>
           ) : lead.error && !notFound ? (
             <>
@@ -119,12 +134,13 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
             </>
           )}
         </DialogHeader>
+        {lead.data && <FollowUpBanner lead={lead.data} tz={tz} />}
 
         {/* Timeline scrolls between the header and the pinned note form; the minimum height
             keeps short timelines from collapsing the dialog. */}
         <div
           ref={timelineRef}
-          className="min-h-0 flex-1 overflow-y-auto bg-muted/30 px-4 sm:min-h-60"
+          className="min-h-0 flex-1 overflow-y-auto bg-muted/40 px-4 sm:min-h-60 sm:px-6"
         >
           {discussions.data ? (
             <ol className="py-5" aria-label="Timeline">
@@ -163,7 +179,7 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
 
         {/* No note form until the lead has loaded: there is nothing to attach a note to yet. */}
         {leadId && lead.data && (
-          <div className="shrink-0 border-t bg-background p-4">
+          <div className="shrink-0 border-t bg-card p-4 sm:px-6">
             <AddDiscussionForm key={leadId} leadId={leadId} />
           </div>
         )}

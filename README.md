@@ -120,6 +120,7 @@ Full log with alternatives and reasons: [docs/DECISIONS.md](docs/DECISIONS.md). 
 | D-16 | Deployed on Vercel, Render and Neon; demo data reseeds only when stale |
 | D-17 | Vitest for browser-side date logic |
 | D-18 | Lead details are edited inline in the dialog header |
+| D-19 | Slate and indigo visual refresh with CRM-style list, dialog and timeline |
 
 ## API
 

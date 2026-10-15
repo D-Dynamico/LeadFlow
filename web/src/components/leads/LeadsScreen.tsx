@@ -52,6 +52,7 @@ export function LeadsScreen() {
         tz={tz}
         filtered={status !== null || q !== ""}
         onSelect={openLead}
+        onAddLead={() => setAddingLead(true)}
       />
       <LeadTimelineDialog leadId={leadId} tz={tz} onClose={closeLead} />
       <AddLeadDialog open={addingLead} onOpenChange={setAddingLead} />

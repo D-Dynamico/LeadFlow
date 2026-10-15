@@ -95,6 +95,17 @@ The form sends name, company and phone together, with a blank company or phone a
 clears; the API ignores unchanged values. Editing details writes no timeline entry: only status
 changes are logged (R-5). The form reuses the Add Lead schema (`lib/leadForm.ts`).
 
+### D-19 Visual refresh: slate and indigo theme, CRM-style list and dialog
+Alternatives: keep the neutral black and white shadcn defaults; a sidebar app shell; a summary row
+of stat cards above the list. Why: the defaults read as a wireframe, and the follow-up urgency
+that R-2 and R-3 encode was hard to see at a glance. Patterns borrowed from current CRMs (Attio,
+Folk, Linear, Twenty): initials avatars, status dots, a segmented filter with counts, aligned
+columns, an attention-tinted pinned card, a follow-up banner in the dialog, icons on the timeline
+rail, and a composer-style note box. No sidebar, since there is one screen. No stat cards, since
+counts that change with search and filters would mislead. Light theme only. Purely presentational:
+no API or rule changes. The overdue and due-today counts in the pinned header only count the API's
+`follow_up_state`. Avatar colour is a hash of the lead id in `lib/avatar.ts`, tested with Vitest.
+
 ## Open
 
 - None. The deploy target was decided in D-16.

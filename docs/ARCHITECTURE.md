@@ -142,12 +142,18 @@ One route, feature folders under `components/`, one API client, hooks per resour
 ([Module map](#module-map)).
 
 ### Components
-- `LeadToolbar`: search (debounced 300 ms), status chips with counts, Add Lead button
-- `LeadList`: Pinned section then All section; skeletons and empty states
-- `LeadRow`: name, company, `StatusBadge`, last note preview, time ago, `FollowUpChip`
+- `LeadToolbar`: page title, Add Lead button (with an `N` hint), segmented status filter with
+  colour dots and counts, search (debounced 300 ms)
+- `LeadList`: Pinned section ("Today's follow-ups", with overdue and due-today counts taken from
+  the API's `follow_up_state`) then All section, as cards with a column header on desktop;
+  skeletons and empty states with an icon (no leads yet offers Add Lead)
+- `LeadRow`: `LeadAvatar`, name, company, last note preview, time ago, `FollowUpChip`, `StatusBadge`;
+  aligned columns on desktop, stacked on mobile; Won and Lost rows are muted
+- `LeadAvatar`: initials with a colour derived from the lead id (`lib/avatar.ts`, display only)
 - `FollowUpChip`: overdue red, today amber, upcoming neutral (state comes from the API, R-2)
-- `LeadTimelineDialog`: header with name, Edit button and `StatusSelect`, scrolling `DiscussionItem`
-  list, `AddDiscussionForm` pinned below
+- `LeadTimelineDialog`: header with avatar, name, Edit button, company, phone (a `tel:` link) and
+  `StatusSelect`; `FollowUpBanner` (state colour, Mark done) under the header; scrolling
+  `DiscussionItem` list with an icon per entry kind; `AddDiscussionForm` pinned below
 - `LeadDetailsForm`: inline name, company, phone inputs with Save and Cancel (D-18); shares the
   Add Lead schema from `lib/leadForm.ts`
 - `AddDiscussionForm`: textarea, separate date and time inputs (a date alone defaults to 10:00),

@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -55,11 +56,16 @@ export function AddLeadDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="gap-5 p-5 sm:max-w-md sm:rounded-2xl">
         <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-          <DialogHeader>
-            <DialogTitle>Add lead</DialogTitle>
-            <DialogDescription>New leads start with the status New.</DialogDescription>
+          <DialogHeader className="flex-row items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+              <UserPlus className="size-5" aria-hidden />
+            </span>
+            <div className="flex flex-col gap-0.5">
+              <DialogTitle>Add lead</DialogTitle>
+              <DialogDescription>New leads start with the status New.</DialogDescription>
+            </div>
           </DialogHeader>
 
           <Field id="lead-name" label="Name" error={errors.name?.message}>
