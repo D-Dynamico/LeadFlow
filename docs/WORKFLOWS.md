@@ -86,12 +86,12 @@ Exit: the definition of done below is fully checked.
 
 ## Definition of done
 
-- [ ] Fresh clone + `cp .env.example .env` + `docker compose up --build` works on a clean machine
-- [ ] All rubric items work by hand, including bonus items
-- [ ] `pytest` and `npm test` green (D-17); `npm run lint` and `npm run typecheck` clean
-- [ ] README: setup (Docker and manual), tests, seed, decisions summary, API table, How I used AI,
+- [x] Fresh clone + `cp .env.example .env` + `docker compose up --build` works on a clean machine
+- [x] All rubric items work by hand, including bonus items
+- [x] `pytest` and `npm test` green (D-17); `npm run lint` and `npm run typecheck` clean
+- [x] README: setup (Docker and manual), tests, seed, decisions summary, API table, How I used AI,
       known limitations, next steps
-- [ ] `.env.example` lists every variable the code reads
+- [x] `.env.example` lists every variable the code reads
 - [x] Screenshots in `docs/screenshots/`; walkthrough video (2 to 3 min) linked in README
-- [ ] Commit history is conventional, one idea per commit, no squash, no tool trailers
-- [ ] Repo is public; no secrets committed
+- [x] Commit history is conventional, one idea per commit, no squash, no tool trailers
+- [x] Repo is public; no secrets committed

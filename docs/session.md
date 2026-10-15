@@ -19,10 +19,10 @@ Updated: Thu 15 Oct 2026. Deadline: Fri 16 Oct.
 - README complete: Loom walkthrough, screenshots in `docs/screenshots/`, shared demo DB (D-13).
 
 ## Now
-- Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). User handles the remaining items.
+- S6 done: every definition-of-done box is ticked (WORKFLOWS.md). Ready to submit.
 
 ## Next
-1. Tick the remaining definition-of-done boxes (WORKFLOWS.md) and submit.
+1. Submit the repo, live demo and Loom links.
 
 ## Working agreement (this session)
 - Per task: read docs, tests in the same commit, update affected docs, D-entry for real choices,
