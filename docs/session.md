@@ -11,19 +11,18 @@ Updated: Thu 15 Oct 2026. Deadline: Fri 16 Oct.
 - HR mockups covered: split date and time follow-up inputs, timeline rail with dated cards and a
   display-only "Lead created" entry, note form pinned below the timeline, Add Lead placeholders.
 - Web unit tests per D-17: Vitest 4, `cd web && npm test` (25 tests), TZ pinned to New York.
-- Edit lead details per D-18: Edit button in the dialog header, inline name/company/phone with
-  Save and Cancel, blank clears via `null`, no timeline entry. API PATCH now has tests
-  (`test_lead_details.py`). Checked in Chrome locally.
-- Mobile check at 390 px, empty and error states (TEST_PLAN.md, Web manual checklist): all pass.
-  Fixed the dialog when a lead fails to load: one Try again for lead and timeline, no note form.
+- Edit lead details inline in the dialog header (D-18); PATCH details tested.
+- Mobile, empty and error states pass (TEST_PLAN.md, Web manual checklist); failed-lead dialog fixed.
+- README complete except screenshots: features, D-5 callout, setup (Node 22.22+), tests, seed,
+  decisions table, API table, How I used AI (user to confirm wording), limitations, next steps.
 
 ## Now
-- Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). README next.
+- Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). Screenshots and video next.
 
 ## Next
-1. README: setup (Docker and manual), seed, decisions summary linking DECISIONS.md, API table,
-   How I used AI, known limitations, next steps. Screenshots in `docs/screenshots/`.
-2. Walkthrough video (2 to 3 min), definition of done.
+1. Screenshots in `docs/screenshots/`, linked from the README.
+2. Walkthrough video (2 to 3 min) linked in the README; tick the definition of done
+   (WORKFLOWS.md), including a fresh-clone `docker compose up --build`.
 
 ## Working agreement (this session)
 - Per task: read docs, tests in the same commit, update affected docs, D-entry for real choices,
