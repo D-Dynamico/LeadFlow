@@ -44,6 +44,12 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
   const notFound = [lead.error, discussions.error].some(
     (error) => error instanceof ApiError && error.status === 404,
   );
+  // One retry for the whole dialog: a failed lead usually means a failed timeline too.
+  const retry = () => {
+    void lead.refetch();
+    void discussions.refetch();
+  };
+
   useEffect(() => {
     if (notFound) {
       toast.error("Lead not found");
@@ -101,6 +107,9 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
             <>
               <DialogTitle>Could not load this lead</DialogTitle>
               <DialogDescription>{lead.error.message}</DialogDescription>
+              <Button variant="outline" size="sm" className="self-start" onClick={retry}>
+                Try again
+              </Button>
             </>
           ) : (
             <>
@@ -129,15 +138,16 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
               ))}
               {lead.data && <LeadCreatedItem createdAt={lead.data.created_at} tz={tz} />}
             </ol>
-          ) : discussions.error && !notFound ? (
-            // Shown only when nothing is cached; a failed refetch keeps the timeline.
+          ) : lead.error && !lead.data ? null : discussions.error && !notFound ? (
+            // Shown only when nothing is cached (a failed refetch keeps the timeline) and the lead
+            // itself loaded; a failed lead has its own Try again in the header.
             <div className="py-6 text-center text-sm">
               <p>Could not load the timeline.</p>
               <Button
                 variant="outline"
                 size="sm"
                 className="mt-3"
-                onClick={() => discussions.refetch()}
+                onClick={retry}
               >
                 Try again
               </Button>
@@ -151,7 +161,8 @@ export function LeadTimelineDialog({ leadId, tz, onClose }: Props) {
           )}
         </div>
 
-        {leadId && (
+        {/* No note form until the lead has loaded: there is nothing to attach a note to yet. */}
+        {leadId && lead.data && (
           <div className="shrink-0 border-t bg-background p-4">
             <AddDiscussionForm key={leadId} leadId={leadId} />
           </div>

@@ -87,6 +87,8 @@ Vitest with jsdom (D-17), run with `cd web && npm test`. `TZ` is pinned to `Amer
 - `lib/leadForm.ts`: schema errors; blank company or phone become `null` in the PATCH body (D-18)
 - Edit lead form: cleared name shows an error and sends nothing; a saved edit sends `PATCH` with
   `phone: null` and closes; Escape cancels without saving
+- Lead dialog: a failed lead hides the note form, and Try again refetches lead and timeline; a
+  loaded lead shows the form and the "Lead created" entry
 
 Web-only logic changes need a test here; purely visual changes note the manual check in the commit.
 
@@ -96,6 +98,11 @@ Run in S5 and S6.
 - change status in dialog, close, refresh: status persists
 - overdue row is red; today row is amber
 - refresh with `?status=qualified&q=ra&lead=<id>` restores filter, search, and open dialog
+- at 390 px wide: no horizontal scroll; rows stack; dialog fills the screen with the note form
+  pinned; Add Lead and edit mode fit
+- empty states: a search with no match shows "No leads match"; an empty database shows "No leads yet"
+- API down: list shows "Could not load leads" with Try again; dialog shows one Try again and no
+  note form, and recovers once the API is back
 
 ## Mutation checks
 
@@ -118,3 +125,5 @@ Break the code on purpose; the named test must fail. Revert after each check. Ru
 | Keep a blank company as an empty string | Lead details: blank clears |
 | Send a blank phone as `""` instead of `null` | Web: `toLeadUpdate`, edit form saves |
 | Escape no longer cancels the edit | Web: edit form Escape |
+| Show the note form before the lead loads | Web: lead dialog failed lead |
+| Try again refetches only the timeline | Web: lead dialog failed lead |
