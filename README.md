@@ -23,6 +23,24 @@ Features:
 Demo data refreshes when it's more than 6 hours old. The free API sleeps when idle, so the first
 request can take about a minute.
 
+## Screenshots
+
+Lead list, with today's and overdue follow-ups pinned to the top:
+
+<p align="center"><img src="docs/screenshots/lead-list.png" alt="Lead list" width="820"></p>
+
+Timeline dialog: follow-up banner, status, notes and the next follow-up:
+
+<p align="center"><img src="docs/screenshots/lead-timeline.png" alt="Lead timeline" width="600"></p>
+
+Add lead (button or `N`):
+
+<p align="center"><img src="docs/screenshots/add-lead.png" alt="Add lead" width="440"></p>
+
+On a phone:
+
+<p align="center"><img src="docs/screenshots/mobile.png" alt="Lead list on a phone" width="300"></p>
+
 ## Stack
 
 - `api/`: FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, Postgres 16, pytest

@@ -16,14 +16,15 @@ Updated: Thu 15 Oct 2026. Deadline: Fri 16 Oct.
 - Fresh-clone check passed: `docker compose up --build`, seed, browser read and write, pytest 74,
   Vitest 30, lint, `npm run typecheck` (runs `next typegen` first so a clean checkout passes).
 - Mobile, empty and error states pass (TEST_PLAN.md, Web manual checklist); failed-lead dialog fixed.
-- README complete except screenshots and video; limitations note the shared demo database (D-13).
+- README complete except the video; limitations note the shared demo database (D-13).
+- Screenshots in `docs/screenshots/` (list, timeline, add lead, mobile), taken from the live
+  site with Playwright at 2x, linked from the README.
 
 ## Now
 - Stage S6 Polish and delivery (WORKFLOWS.md, Build stages). User handles the remaining items.
 
 ## Next
-1. Screenshots of the new UI in `docs/screenshots/`, linked from the README.
-2. Walkthrough video (2 to 3 min) linked in the README; tick the definition of done (WORKFLOWS.md).
+1. Walkthrough video (2 to 3 min) linked in the README; tick the definition of done (WORKFLOWS.md).
 
 ## Working agreement (this session)
 - Per task: read docs, tests in the same commit, update affected docs, D-entry for real choices,
